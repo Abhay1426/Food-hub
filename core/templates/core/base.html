@@ -1,0 +1,646 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FF5722">
+  <meta name="description" content="FoodHub - Order fresh food online, fast delivery!">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FoodHub">
+  <link rel="manifest" href="/static/manifest.json">
+  <title>FoodHub 🍔</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet"/>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+
+  <style>
+    :root {
+      --orange: #FF5722;
+      --orange2: #FF7043;
+      --dark: #111111;
+      --dark2: #1c1c1c;
+      --cream: #FFFBF7;
+      --gray: #6b7280;
+      /* Dark mode vars */
+      --bg: #FFFBF7;
+      --bg2: #ffffff;
+      --text: #111111;
+      --text2: #6b7280;
+      --border-col: #e5e7eb;
+      --card-bg: #ffffff;
+    }
+
+    /* ── DARK MODE ── */
+    body.dark-mode {
+      --bg: #0f0f0f;
+      --bg2: #1a1a1a;
+      --text: #f0f0f0;
+      --text2: #9ca3af;
+      --border-col: #2d2d2d;
+      --card-bg: #1c1c1c;
+      --cream: #0f0f0f;
+      background: var(--bg) !important;
+      color: var(--text) !important;
+    }
+    body.dark-mode .navbar-custom { background: rgba(5,5,5,.97) !important; }
+    body.dark-mode .footer-custom { background: #050505; }
+    body.dark-mode .content-wrap { background: var(--bg); }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+      transition: background .3s, color .3s;
+    }
+
+    /* ─── LOADER ─── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--dark);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+    }
+    .loader-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; color: #fff; letter-spacing: .04em;
+    }
+    .loader-logo span { color: var(--orange); }
+    .loader-bar {
+      width: 160px; height: 3px;
+      background: rgba(255,255,255,.12); border-radius: 99px; overflow: hidden;
+    }
+    .loader-bar::after {
+      content: '';
+      display: block; height: 100%;
+      width: 40%; background: var(--orange); border-radius: 99px;
+      animation: loadSlide 1s ease-in-out infinite alternate;
+    }
+    @keyframes loadSlide {
+      from { transform: translateX(0); }
+      to   { transform: translateX(200%); }
+    }
+
+    /* ─── NAVBAR ─── */
+    .navbar-custom {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(17,17,17,0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      padding: 0 4vw;
+      height: 68px;
+      display: flex; align-items: center;
+      transition: background .3s, box-shadow .3s;
+    }
+    .navbar-custom.scrolled {
+      background: rgba(10,10,10,0.98);
+      box-shadow: 0 4px 24px rgba(0,0,0,.35);
+    }
+
+    .navbar-inner {
+      width: 100%; display: flex;
+      align-items: center; justify-content: space-between;
+      gap: 20px;
+    }
+
+    /* Brand */
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem; color: #fff; font-weight: 700;
+      white-space: nowrap;
+      transition: opacity .2s;
+    }
+    .nav-brand:hover { opacity: .85; text-decoration: none; color: #fff; }
+    .nav-brand-icon {
+      width: 36px; height: 36px;
+      background: var(--orange);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .nav-brand span { color: var(--orange); }
+
+    /* Nav links */
+    .nav-links {
+      display: flex; align-items: center; gap: 4px;
+      list-style: none; margin: 0; padding: 0;
+    }
+    .nav-links a {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 10px;
+      color: rgba(255,255,255,.72); font-size: .9rem; font-weight: 500;
+      text-decoration: none; transition: all .2s; white-space: nowrap;
+    }
+    .nav-links a:hover {
+      color: #fff; background: rgba(255,255,255,.08);
+      text-decoration: none;
+    }
+    .nav-links a.active {
+      color: var(--orange);
+      background: rgba(255,87,34,.12);
+    }
+    .nav-links a i { font-size: .85rem; opacity: .8; }
+
+    /* Cart badge */
+    .cart-link {
+      position: relative;
+    }
+    .cart-badge {
+      position: absolute; top: 2px; right: 4px;
+      background: var(--orange); color: #fff;
+      font-size: .6rem; font-weight: 700;
+      min-width: 17px; height: 17px; border-radius: 99px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--dark);
+      animation: popIn .3s cubic-bezier(.36,.07,.19,.97);
+    }
+    @keyframes popIn {
+      0%   { transform: scale(0); }
+      80%  { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Right side: avatar + logout */
+    .nav-right {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .nav-avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--orange), #e64a19);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: .85rem;
+      cursor: pointer; text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .nav-avatar:hover {
+      transform: scale(1.08);
+      box-shadow: 0 4px 14px rgba(255,87,34,.45);
+      text-decoration: none; color: #fff;
+    }
+
+    .btn-logout {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 10px;
+      background: rgba(255,87,34,.12); border: 1px solid rgba(255,87,34,.25);
+      color: var(--orange); font-size: .88rem; font-weight: 500;
+      text-decoration: none; transition: all .2s;
+    }
+    .btn-logout:hover {
+      background: var(--orange); color: #fff;
+      text-decoration: none; border-color: var(--orange);
+    }
+
+    /* Mobile toggle */
+    .nav-toggle {
+      display: none;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+      color: #fff; width: 40px; height: 40px; border-radius: 10px;
+      align-items: center; justify-content: center;
+      font-size: 1.1rem; cursor: pointer; transition: background .2s;
+    }
+    .nav-toggle:hover { background: rgba(255,255,255,.15); }
+
+    /* Mobile menu */
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      background: var(--dark2);
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding: 12px 4vw 20px;
+      gap: 4px;
+    }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-radius: 12px;
+      color: rgba(255,255,255,.75); font-size: .95rem; font-weight: 500;
+      text-decoration: none; transition: all .2s;
+    }
+    .nav-mobile a:hover {
+      background: rgba(255,255,255,.07); color: #fff; text-decoration: none;
+    }
+    .nav-mobile a.logout-m {
+      color: var(--orange); margin-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.07); padding-top: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .nav-links, .nav-right { display: none; }
+      .nav-toggle { display: flex; }
+    }
+
+    /* ─── CONTENT WRAPPER ─── */
+    .content-wrap {
+      padding: 0;
+      background: #FFF8F2;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer-custom {
+      background: var(--dark);
+      color: rgba(255,255,255,.55);
+      margin-top: 80px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      padding: 60px 6vw 40px;
+    }
+    .footer-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; color: #fff; font-weight: 700;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .footer-brand-name span { color: var(--orange); }
+    .footer-desc { font-size: .88rem; line-height: 1.7; margin-bottom: 20px; }
+    .footer-col h6 {
+      color: #fff; font-weight: 600; font-size: .9rem;
+      margin-bottom: 16px; letter-spacing: .04em; text-transform: uppercase;
+    }
+    .footer-col ul { list-style: none; padding: 0; margin: 0; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a {
+      color: rgba(255,255,255,.5); font-size: .88rem;
+      text-decoration: none; transition: color .2s;
+    }
+    .footer-col ul li a:hover { color: var(--orange); text-decoration: none; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 20px 6vw;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+      font-size: .82rem;
+    }
+    .footer-bottom a { color: var(--orange); text-decoration: none; }
+
+    /* ─── TOAST MESSAGES ─── */
+    .toast-stack {
+      position: fixed; top: 82px; right: 20px; z-index: 9000;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast-msg {
+      background: var(--dark2); color: #fff;
+      border-left: 4px solid var(--orange);
+      padding: 14px 20px; border-radius: 12px;
+      font-size: .9rem; font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,.3);
+      animation: slideIn .35s ease;
+      max-width: 300px;
+    }
+    .toast-msg.success { border-color: #27ae60; }
+    .toast-msg.error   { border-color: #e74c3c; }
+    @keyframes slideIn {
+      from { transform: translateX(120px); opacity: 0; }
+      to   { transform: translateX(0);     opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ LOADER ══ -->
+  <div id="loader">
+    <div class="loader-logo">Food<span>Hub</span></div>
+    <div class="loader-bar"></div>
+  </div>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar-custom" id="mainNav">
+    <div class="navbar-inner">
+
+      <!-- Brand -->
+      <a class="nav-brand" href="/">
+        <div class="nav-brand-icon">🍔</div>
+        Food<span>Hub</span>
+      </a>
+
+      <!-- Desktop Links -->
+      <ul class="nav-links">
+        <li>
+          <a href="/" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+        </li>
+        <li>
+          <a href="/foods/" {% if request.resolver_match.url_name == 'food_list' %}class="active"{% endif %}>
+            <i class="fa-solid fa-utensils"></i> Menu
+          </a>
+        </li>
+        <li>
+          <a href="/cart/" class="cart-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
+            <i class="fa-solid fa-cart-shopping"></i> Cart
+            {% if cart_count > 0 %}
+            <span class="cart-badge">{{ cart_count }}</span>
+            {% endif %}
+          </a>
+        </li>
+        <li>
+          <a href="/orders/" {% if request.resolver_match.url_name == 'my_orders' %}class="active"{% endif %}>
+            <i class="fa-solid fa-box"></i> Orders
+          </a>
+        </li>
+        <li>
+          <a href="/wishlist/" {% if request.resolver_match.url_name == 'wishlist' %}class="active"{% endif %}>
+            <i class="fa-solid fa-heart"></i> Wishlist
+          </a>
+        </li>
+        {% if request.user.is_staff %}
+        <li>
+          <a href="/dashboard/" {% if request.resolver_match.url_name == 'dashboard' %}class="active"{% endif %} style="color:#f59e0b;">
+            <i class="fa-solid fa-chart-line"></i> Admin
+          </a>
+        </li>
+        {% endif %}
+        <li>
+          <a href="/profile/" {% if request.resolver_match.url_name == 'profile' %}class="active"{% endif %}>
+            <i class="fa-solid fa-user"></i> Profile
+          </a>
+        </li>
+      </ul>
+
+      <!-- Right side -->
+      <div class="nav-right">
+        <!-- Dark Mode Toggle -->
+        <button id="darkToggle" onclick="toggleDark()"
+                style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all .2s;"
+                title="Toggle Dark Mode">
+          🌙
+        </button>
+        <a href="/profile/" class="nav-avatar" title="Profile">
+          {{ request.user.username|slice:":1"|upper|default:"U" }}
+        </a>
+        <a href="/logout/" class="btn-logout">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+      </div>
+
+      <!-- Mobile toggle -->
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <i class="fa-solid fa-bars" id="toggleIcon"></i>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ══ MOBILE MENU ══ -->
+  <div class="nav-mobile" id="mobileMenu">
+    <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    <a href="/foods/"><i class="fa-solid fa-utensils"></i> Menu</a>
+    <a href="/cart/">
+      <i class="fa-solid fa-cart-shopping"></i> Cart
+      {% if cart_count > 0 %}<span style="background:var(--orange);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:99px;font-weight:700;">{{ cart_count }}</span>{% endif %}
+    </a>
+    <a href="/orders/"><i class="fa-solid fa-box"></i> My Orders</a>
+    <a href="/wishlist/"><i class="fa-solid fa-heart"></i> Wishlist</a>
+    {% if request.user.is_staff %}
+    <a href="/dashboard/" style="color:#f59e0b;"><i class="fa-solid fa-chart-line"></i> Admin Dashboard</a>
+    {% endif %}
+    <a href="/profile/"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="/wishlist/"><i class="fa-solid fa-heart"></i> Wishlist</a>
+    {% if request.user.is_staff %}
+    <a href="/dashboard/" style="color:#f59e0b;"><i class="fa-solid fa-chart-line"></i> Admin Dashboard</a>
+    {% endif %}
+    <a href="/profile/"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="/logout/" class="logout-m"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </div>
+
+  <!-- ══ DJANGO MESSAGES (Toast) ══ -->
+  {% if messages %}
+  <div class="toast-stack" id="toastStack">
+    {% for message in messages %}
+    <div class="toast-msg {{ message.tags }}">
+      {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% else %}ℹ️{% endif %}
+      &nbsp;{{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ══ PAGE CONTENT ══ -->
+  <div class="content-wrap">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer-custom">
+    <div class="footer-top">
+
+      <div>
+        <div class="footer-brand-name">🍔 Food<span>Hub</span></div>
+        <p class="footer-desc">Delicious food delivered to your door. Fresh ingredients, fast delivery, every time.</p>
+        <div style="display:flex;gap:12px;">
+          <a href="#" style="color:rgba(255,255,255,.4);font-size:1.1rem;transition:color .2s;" onmouseover="this.style.color='#FF5722'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" style="color:rgba(255,255,255,.4);font-size:1.1rem;transition:color .2s;" onmouseover="this.style.color='#FF5722'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" style="color:rgba(255,255,255,.4);font-size:1.1rem;transition:color .2s;" onmouseover="this.style.color='#FF5722'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fa-brands fa-twitter"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h6>Quick Links</h6>
+        <ul>
+          <li><a href="/"><i class="fa-solid fa-chevron-right" style="font-size:.65rem;margin-right:6px;"></i>Home</a></li>
+          <li><a href="/foods/"><i class="fa-solid fa-chevron-right" style="font-size:.65rem;margin-right:6px;"></i>Menu</a></li>
+          <li><a href="/cart/"><i class="fa-solid fa-chevron-right" style="font-size:.65rem;margin-right:6px;"></i>Cart</a></li>
+          <li><a href="/orders/"><i class="fa-solid fa-chevron-right" style="font-size:.65rem;margin-right:6px;"></i>My Orders</a></li>
+          <li><a href="/profile/"><i class="fa-solid fa-chevron-right" style="font-size:.65rem;margin-right:6px;"></i>Profile</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h6>Contact Us</h6>
+        <ul>
+          <li><a href="mailto:support@foodhub.com"><i class="fa-solid fa-envelope" style="margin-right:8px;"></i>support@foodhub.com</a></li>
+          <li><a href="tel:+919876543210"><i class="fa-solid fa-phone" style="margin-right:8px;"></i>+91 98765 43210</a></li>
+          <li style="color:rgba(255,255,255,.4);font-size:.88rem;margin-top:4px;"><i class="fa-solid fa-clock" style="margin-right:8px;"></i>Mon–Sun: 9AM – 11PM</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 <a href="/">FoodHub</a>. All rights reserved.</span>
+      <span>Made with ❤️ for food lovers</span>
+    </div>
+  </footer>
+
+  <!-- ══ LIVE CHAT BUTTON ══ -->
+  <div id="chatBtn" onclick="toggleChat()"
+       style="position:fixed;bottom:28px;right:28px;z-index:8888;
+              width:58px;height:58px;border-radius:50%;
+              background:var(--orange);color:#fff;
+              display:flex;align-items:center;justify-content:center;
+              font-size:1.5rem;cursor:pointer;
+              box-shadow:0 6px 24px rgba(255,87,34,.45);
+              transition:transform .3s,box-shadow .3s;
+              animation:chatPop .6s 2s cubic-bezier(.36,.07,.19,.97) both;"
+       title="Chat with us">
+    💬
+  </div>
+
+  <!-- Chat Popup -->
+  <div id="chatPopup"
+       style="display:none;position:fixed;bottom:100px;right:28px;z-index:8887;
+              width:300px;background:#fff;border-radius:20px;
+              box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden;
+              animation:slideUp .3s ease;">
+    <div style="background:var(--orange);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="color:#fff;font-weight:700;font-size:.96rem;">💬 FoodHub Support</div>
+        <div style="color:rgba(255,255,255,.75);font-size:.74rem;">🟢 Online — typically replies instantly</div>
+      </div>
+      <button onclick="toggleChat()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px;background:#f9fafb;min-height:120px;">
+      <div style="background:#fff;border-radius:14px 14px 14px 4px;padding:12px 14px;font-size:.86rem;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:12px;max-width:85%;">
+        👋 Hi! Welcome to FoodHub. How can we help you today?
+      </div>
+      <div style="background:#fff;border-radius:14px 14px 14px 4px;padding:12px 14px;font-size:.86rem;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.06);max-width:90%;">
+        You can also reach us at <strong>support@foodhub.com</strong> or call <strong>+91 98765 43210</strong>
+      </div>
+    </div>
+    <div style="padding:12px 16px;border-top:1px solid #f0f0f0;display:flex;gap:8px;">
+      <input id="chatInput" type="text" placeholder="Type a message..."
+             style="flex:1;padding:10px 14px;border-radius:99px;border:1.5px solid #e5e7eb;font-size:.86rem;outline:none;font-family:'DM Sans',sans-serif;"
+             onkeypress="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()"
+              style="background:var(--orange);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">
+        →
+      </button>
+    </div>
+  </div>
+
+  <style>
+    @keyframes chatPop { 0%{transform:scale(0);opacity:0} 80%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+    @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+    #chatBtn:hover { transform:scale(1.1); box-shadow:0 10px 32px rgba(255,87,34,.55); }
+
+    /* Dark mode toggle animation */
+    #darkToggle { transition:all .3s; }
+  </style>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <script>
+    // AOS
+    AOS.init({ once: true, duration: 600 });
+
+    // Loader hide
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loader');
+      loader.style.opacity = '0';
+      loader.style.transition = 'opacity .4s ease';
+      setTimeout(() => loader.style.display = 'none', 400);
+    });
+
+    // Navbar scroll effect
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Mobile menu toggle
+    const toggle = document.getElementById('navToggle');
+    const menu   = document.getElementById('mobileMenu');
+    const icon   = document.getElementById('toggleIcon');
+    toggle.addEventListener('click', () => {
+      menu.classList.toggle('open');
+      icon.className = menu.classList.contains('open')
+        ? 'fa-solid fa-xmark'
+        : 'fa-solid fa-bars';
+    });
+
+    // Auto dismiss toasts
+    const toastStack = document.getElementById('toastStack');
+    if (toastStack) {
+      setTimeout(() => {
+        toastStack.style.opacity = '0';
+        toastStack.style.transition = 'opacity .5s';
+        setTimeout(() => toastStack.remove(), 500);
+      }, 3500);
+    }
+
+    // Fade-in on scroll (legacy support)
+    const fadeEls = document.querySelectorAll('.fade-in');
+    window.addEventListener('scroll', () => {
+      fadeEls.forEach(el => {
+        if (el.getBoundingClientRect().top < window.innerHeight - 100)
+          el.classList.add('show');
+      });
+    });
+
+    // ── DARK MODE ──
+    const darkBtn = document.getElementById('darkToggle');
+    function toggleDark() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      darkBtn.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('darkMode', isDark ? '1' : '0');
+    }
+    // Restore preference
+    if (localStorage.getItem('darkMode') === '1') {
+      document.body.classList.add('dark-mode');
+      darkBtn.textContent = '☀️';
+    }
+
+    // ── LIVE CHAT ──
+    function toggleChat() {
+      const popup = document.getElementById('chatPopup');
+      popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+      if (popup.style.display === 'block') {
+        document.getElementById('chatInput').focus();
+      }
+    }
+    function sendChat() {
+      const input = document.getElementById('chatInput');
+      const msg   = input.value.trim();
+      if (!msg) return;
+      const chatBody = document.querySelector('#chatPopup > div:nth-child(2)');
+      const bubble   = document.createElement('div');
+      bubble.style.cssText = 'background:var(--orange);color:#fff;border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:.86rem;margin:10px 0 0 auto;max-width:85%;text-align:right;';
+      bubble.textContent = msg;
+      chatBody.appendChild(bubble);
+      input.value = '';
+      // Auto reply
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.style.cssText = 'background:#fff;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:.86rem;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:10px;max-width:85%;';
+        reply.textContent = '✅ Thanks for reaching out! Our team will get back to you soon. For urgent help call +91 98765 43210';
+        chatBody.appendChild(reply);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 1200);
+    }
+
+    // ── PWA SERVICE WORKER ──
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js')
+          .then(() => console.log('PWA: Service Worker registered'))
+          .catch(e => console.log('PWA: SW error', e));
+      });
+    }
+  </script>
+
+</body>
+</html>

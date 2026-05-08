@@ -1,0 +1,390 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root { --orange:#FF5722; --dark:#111; --cream:#FFFBF7; --gray:#6b7280; --green:#16a34a; }
+* { box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); }
+
+.page-header {
+  background:linear-gradient(135deg,var(--dark) 0%,#001a00 100%);
+  padding:44px 6vw 38px; position:relative; overflow:hidden;
+}
+.page-header::before { content:'🛵'; position:absolute; right:6vw; top:50%; transform:translateY(-50%); font-size:6rem; opacity:.08; }
+.page-header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3.5vw,2.6rem); color:#fff; margin-bottom:4px; }
+.page-header h1 span { color:var(--orange); }
+.page-header p { color:rgba(255,255,255,.5); font-size:.9rem; margin:0; }
+
+.track-layout {
+  display:grid; grid-template-columns:1fr 340px;
+  gap:24px; padding:32px 5vw 60px; align-items:start;
+}
+@media(max-width:820px) { .track-layout { grid-template-columns:1fr; } }
+
+/* ── MAP ── */
+.map-card {
+  background:#fff; border-radius:20px; overflow:hidden;
+  box-shadow:0 2px 18px rgba(0,0,0,.08); margin-bottom:22px;
+}
+.map-container {
+  position:relative; height:380px;
+  background:linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 100%);
+  overflow:hidden;
+}
+
+/* Road */
+.road {
+  position:absolute; bottom:40%; left:0; right:0;
+  height:28px; background:#90a4ae; border-radius:0;
+}
+.road::before {
+  content:''; position:absolute; top:50%; left:0; right:0;
+  height:3px; background:repeating-linear-gradient(90deg,#fff 0,#fff 30px,transparent 30px,transparent 60px);
+  transform:translateY(-50%);
+}
+
+/* Buildings */
+.building {
+  position:absolute; bottom:calc(40% + 28px);
+  background:#78909c; border-radius:4px 4px 0 0;
+}
+.building::before { content:''; position:absolute; top:8px; left:6px; right:6px; bottom:8px; background:repeating-linear-gradient(0deg,rgba(255,255,255,.15) 0,rgba(255,255,255,.15) 4px,transparent 4px,transparent 12px); }
+
+/* Restaurant marker */
+.marker-rest {
+  position:absolute; bottom:calc(40% + 28px); left:8%;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+.marker-rest__icon {
+  width:44px; height:44px; border-radius:50%;
+  background:#FF5722; border:3px solid #fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; box-shadow:0 4px 14px rgba(255,87,34,.4);
+}
+.marker-rest__label {
+  background:#fff; padding:3px 9px; border-radius:99px;
+  font-size:.65rem; font-weight:700; color:#FF5722;
+  box-shadow:0 2px 8px rgba(0,0,0,.1); white-space:nowrap;
+}
+
+/* Home marker */
+.marker-home {
+  position:absolute; bottom:calc(40% + 28px); right:8%;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+.marker-home__icon {
+  width:44px; height:44px; border-radius:50%;
+  background:var(--green); border:3px solid #fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; box-shadow:0 4px 14px rgba(22,163,74,.4);
+}
+.marker-home__label {
+  background:#fff; padding:3px 9px; border-radius:99px;
+  font-size:.65rem; font-weight:700; color:var(--green);
+  box-shadow:0 2px 8px rgba(0,0,0,.1); white-space:nowrap;
+}
+
+/* Delivery bike */
+.bike {
+  position:absolute; bottom:calc(40% + 28px);
+  font-size:1.8rem; z-index:10;
+  animation:rideAcross 6s linear infinite;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.2));
+}
+@keyframes rideAcross {
+  0%   { left:14%; transform:scaleX(1); }
+  48%  { left:80%; transform:scaleX(1); }
+  50%  { left:80%; transform:scaleX(-1); }
+  98%  { left:14%; transform:scaleX(-1); }
+  100% { left:14%; transform:scaleX(1); }
+}
+
+/* Pulse circles */
+.pulse-rest, .pulse-home {
+  position:absolute; bottom:calc(40% + 28px);
+  width:60px; height:60px; border-radius:50%;
+  animation:pulseRing 2s ease-out infinite;
+}
+.pulse-rest { left:calc(8% - 8px); background:rgba(255,87,34,.2); }
+.pulse-home { right:calc(8% - 8px); background:rgba(22,163,74,.2); }
+@keyframes pulseRing {
+  0%   { transform:scale(0.8); opacity:1; }
+  100% { transform:scale(1.6); opacity:0; }
+}
+
+/* ETA badge */
+.eta-badge {
+  position:absolute; top:16px; left:50%; transform:translateX(-50%);
+  background:var(--dark); color:#fff;
+  padding:8px 20px; border-radius:99px;
+  font-size:.82rem; font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+  white-space:nowrap;
+}
+
+/* trees */
+.tree { position:absolute; font-size:1.4rem; bottom:calc(40% + 28px); }
+
+/* ── TRACKING STEPS ── */
+.steps-card {
+  background:#fff; border-radius:20px; padding:26px;
+  box-shadow:0 2px 18px rgba(0,0,0,.08);
+}
+.steps-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--dark); margin-bottom:20px; }
+.step-row {
+  display:flex; gap:14px; padding-bottom:20px;
+  position:relative;
+}
+.step-row::before {
+  content:''; position:absolute; left:19px; top:38px; bottom:0;
+  width:2px; background:#f0f0f0; z-index:0;
+}
+.step-row:last-child::before { display:none; }
+.step-dot {
+  width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.9rem; z-index:1; border:2px solid;
+  transition:all .3s;
+}
+.step-dot.done   { background:var(--green); border-color:var(--green); color:#fff; }
+.step-dot.active { background:var(--orange); border-color:var(--orange); color:#fff; box-shadow:0 4px 14px rgba(255,87,34,.35); animation:stepPulse 1.5s ease-in-out infinite; }
+.step-dot.wait   { background:#f9fafb; border-color:#e5e7eb; color:#9ca3af; }
+@keyframes stepPulse { 0%,100%{box-shadow:0 4px 14px rgba(255,87,34,.35)} 50%{box-shadow:0 4px 24px rgba(255,87,34,.6)} }
+
+.step-info {}
+.step-label { font-weight:700; font-size:.92rem; color:var(--dark); margin-bottom:2px; }
+.step-time  { font-size:.78rem; color:var(--gray); }
+.step-label.active-label { color:var(--orange); }
+
+/* sidebar */
+.sidebar-card {
+  background:#fff; border-radius:20px; padding:24px;
+  box-shadow:0 2px 18px rgba(0,0,0,.08); margin-bottom:18px;
+}
+.sidebar-title { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--dark); margin-bottom:16px; padding-bottom:12px; border-bottom:1.5px solid #f0f0f0; }
+.info-r { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #f7f7f7; }
+.info-r:last-child { border-bottom:none; }
+.info-ic { width:34px; height:34px; border-radius:10px; background:#fff8f5; border:1px solid #ffe0cc; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
+.info-lb { font-size:.74rem; color:var(--gray); font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
+.info-vl { font-size:.9rem; color:var(--dark); font-weight:600; margin-top:1px; }
+
+.btn-back-orders {
+  display:flex; align-items:center; gap:7px; justify-content:center;
+  background:var(--dark); color:#fff; padding:13px 28px;
+  border-radius:99px; text-decoration:none; font-weight:600;
+  font-size:.9rem; transition:all .22s; width:100%;
+}
+.btn-back-orders:hover { background:var(--orange); color:#fff; text-decoration:none; transform:translateY(-2px); }
+</style>
+
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Live <span>Tracking</span> 🛵</h1>
+  <p>Order #{{ order.id }} — {{ order.status }}</p>
+</div>
+
+
+<div class="track-layout">
+
+  <!-- LEFT -->
+  <div>
+
+    <!-- ANIMATED MAP -->
+    <div class="map-card">
+      <div class="map-container">
+
+        <!-- ETA -->
+        <div class="eta-badge">
+          🕐 ETA:
+          {% if order.status == 'Preparing' %}25–30 min
+          {% elif order.status == 'Out for Delivery' %}10–15 min
+          {% elif order.status == 'Delivered' %}Delivered ✅
+          {% else %}Calculating...{% endif %}
+        </div>
+
+        <!-- Pulse rings -->
+        <div class="pulse-rest"></div>
+        <div class="pulse-home"></div>
+
+        <!-- Road -->
+        <div class="road"></div>
+
+        <!-- Buildings -->
+        <div class="building" style="left:18%;width:55px;height:80px;"></div>
+        <div class="building" style="left:28%;width:40px;height:55px;background:#607d8b;"></div>
+        <div class="building" style="left:38%;width:65px;height:95px;"></div>
+        <div class="building" style="left:52%;width:45px;height:70px;background:#546e7a;"></div>
+        <div class="building" style="left:62%;width:50px;height:60px;"></div>
+        <div class="building" style="right:18%;width:55px;height:85px;background:#607d8b;"></div>
+
+        <!-- Trees -->
+        <div class="tree" style="left:4%;">🌳</div>
+        <div class="tree" style="left:44%;">🌲</div>
+        <div class="tree" style="right:4%;">🌳</div>
+
+        <!-- Markers -->
+        <div class="marker-rest">
+          <div class="marker-rest__icon">🍔</div>
+          <div class="marker-rest__label">Restaurant</div>
+        </div>
+
+        <div class="marker-home">
+          <div class="marker-home__icon">🏠</div>
+          <div class="marker-home__label">Your Location</div>
+        </div>
+
+        <!-- Animated Bike -->
+        {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
+        <div class="bike">🛵</div>
+        {% else %}
+        <div style="position:absolute;bottom:calc(40% + 28px);right:8%;font-size:1.8rem;">✅</div>
+        {% endif %}
+
+        <!-- Sky / Ground -->
+        <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(135deg,#a5d6a7,#81c784);"></div>
+
+      </div>
+
+      <!-- Map Info Bar -->
+      <div style="padding:14px 20px;display:flex;justify-content:space-around;border-top:1px solid #f0f0f0;flex-wrap:wrap;gap:10px;">
+        <div style="text-align:center;">
+          <div style="font-size:.7rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Distance</div>
+          <div style="font-weight:700;color:var(--dark);font-size:.96rem;margin-top:2px;">2.4 km</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:.7rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Status</div>
+          <div style="font-weight:700;color:var(--orange);font-size:.96rem;margin-top:2px;">{{ order.status }}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:.7rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Delivery Partner</div>
+          <div style="font-weight:700;color:var(--dark);font-size:.96rem;margin-top:2px;">Rahul K. ⭐4.9</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- TRACKING STEPS -->
+    <div class="steps-card">
+      <div class="steps-title">📍 Order Journey</div>
+
+      <div class="step-row">
+        <div class="step-dot done">✓</div>
+        <div class="step-info">
+          <div class="step-label">Order Placed</div>
+          <div class="step-time">{{ order.created_at|date:"h:i A" }} — Confirmed</div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-dot {% if order.status == 'Preparing' %}active{% elif order.status == 'Out for Delivery' or order.status == 'Delivered' %}done{% else %}wait{% endif %}">
+          {% if order.status == 'Out for Delivery' or order.status == 'Delivered' %}✓{% else %}🔥{% endif %}
+        </div>
+        <div class="step-info">
+          <div class="step-label {% if order.status == 'Preparing' %}active-label{% endif %}">Kitchen Preparing</div>
+          <div class="step-time">
+            {% if order.status == 'Preparing' %}In progress...
+            {% elif order.status == 'Out for Delivery' or order.status == 'Delivered' %}Done ✅
+            {% else %}Waiting{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-dot {% if order.status == 'Out for Delivery' %}active{% elif order.status == 'Delivered' %}done{% else %}wait{% endif %}">
+          {% if order.status == 'Delivered' %}✓{% else %}🛵{% endif %}
+        </div>
+        <div class="step-info">
+          <div class="step-label {% if order.status == 'Out for Delivery' %}active-label{% endif %}">Out for Delivery</div>
+          <div class="step-time">
+            {% if order.status == 'Out for Delivery' %}On the way!
+            {% elif order.status == 'Delivered' %}Completed ✅
+            {% else %}Soon...{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-dot {% if order.status == 'Delivered' %}done{% else %}wait{% endif %}">
+          {% if order.status == 'Delivered' %}✓{% else %}🏠{% endif %}
+        </div>
+        <div class="step-info">
+          <div class="step-label">Delivered</div>
+          <div class="step-time">
+            {% if order.status == 'Delivered' %}Enjoy your meal! 🎉
+            {% else %}Almost there!{% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SIDEBAR -->
+  <div style="position:sticky;top:90px;">
+
+    <div class="sidebar-card">
+      <div class="sidebar-title">📦 Order Details</div>
+      <div class="info-r">
+        <div class="info-ic">🔢</div>
+        <div><div class="info-lb">Order ID</div><div class="info-vl">#{{ order.id }}</div></div>
+      </div>
+      <div class="info-r">
+        <div class="info-ic">💰</div>
+        <div><div class="info-lb">Total</div><div class="info-vl" style="color:var(--orange);">₹{{ order.total_amount|floatformat:0 }}</div></div>
+      </div>
+      <div class="info-r">
+        <div class="info-ic">📍</div>
+        <div><div class="info-lb">Deliver To</div><div class="info-vl">{{ order.address|truncatechars:45 }}</div></div>
+      </div>
+      <div class="info-r">
+        <div class="info-ic">👤</div>
+        <div><div class="info-lb">Name</div><div class="info-vl">{{ order.full_name }}</div></div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">🍽️ Your Items</div>
+      {% for item in order.items.all %}
+      <div class="info-r">
+        <div class="info-ic">{{ forloop.counter }}</div>
+        <div style="flex:1;">
+          <div class="info-vl">{{ item.food.name }}</div>
+          <div class="info-lb">× {{ item.quantity }} — ₹{{ item.food.price|floatformat:0 }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <a href="{% url 'my_orders' %}" class="btn-back-orders">← Back to My Orders</a>
+
+  </div>
+
+</div>
+
+
+<script>
+  // Auto-refresh page every 30 seconds to update status
+  {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
+  setTimeout(() => location.reload(), 30000);
+
+  // Countdown timer
+  let eta = {% if order.status == 'Preparing' %}27{% elif order.status == 'Out for Delivery' %}12{% else %}0{% endif %};
+  if (eta > 0) {
+    const badge = document.querySelector('.eta-badge');
+    setInterval(() => {
+      if (eta > 0) {
+        eta--;
+        badge.innerHTML = `🕐 ETA: ${eta} min`;
+      }
+    }, 60000);
+  }
+  {% endif %}
+</script>
+
+{% endblock %}

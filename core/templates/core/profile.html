@@ -1,0 +1,115 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#FFF8F2!important}
+.content-wrap{background:#FFF8F2!important;padding:0!important}
+:root{--or:#FF5722;--or2:#FF7043;--dk:#1a1a1a;--cream:#FFF8F2;--gray:#6b7280;--border:#e5e7eb;--green:#16a34a}
+.prof-hero{background:linear-gradient(135deg,#1a1a1a 0%,#2d1200 100%);padding:50px 6vw 80px;position:relative;overflow:hidden;text-align:center}
+.prof-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 50%,rgba(255,87,34,.15),transparent 60%)}
+.av-wrap{position:relative;display:inline-block;margin-bottom:14px}
+.av{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--or),#e64a19);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:#fff;margin:0 auto;box-shadow:0 8px 28px rgba(255,87,34,.45);border:3px solid rgba(255,255,255,.2)}
+.av-online{position:absolute;bottom:4px;right:4px;width:17px;height:17px;border-radius:50%;background:#22c55e;border:2.5px solid #1a1a1a}
+.prof-name{font-family:'Playfair Display',serif;font-size:1.7rem;color:#fff;font-weight:700;margin-bottom:4px}
+.prof-email{color:rgba(255,255,255,.55);font-size:.88rem;margin-bottom:18px}
+.prof-stats{display:flex;justify-content:center;gap:28px;flex-wrap:wrap}
+.ps-item{text-align:center;color:#fff}
+.ps-n{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;line-height:1}
+.ps-l{font-size:.72rem;color:rgba(255,255,255,.55);margin-top:3px;letter-spacing:.04em}
+.prof-layout{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding:28px 5vw 60px;margin-top:-40px;position:relative;z-index:2}
+@media(max-width:700px){.prof-layout{grid-template-columns:1fr}}
+.pcard{background:#fff;border-radius:20px;padding:26px;box-shadow:0 2px 14px rgba(0,0,0,.07);animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.pcard-title{font-family:'Playfair Display',serif;font-size:1.08rem;font-weight:700;color:var(--dk);margin-bottom:18px;padding-bottom:13px;border-bottom:1.5px solid #f0f0f0;display:flex;align-items:center;gap:7px}
+.info-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f7f7f7}
+.info-row:last-child{border-bottom:none}
+.info-ic{width:36px;height:36px;border-radius:10px;background:#FFF8F2;border:1px solid #FFE0CC;display:flex;align-items:center;justify-content:center;font-size:.92rem;flex-shrink:0}
+.info-lbl{font-size:.72rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.info-val{font-size:.9rem;color:var(--dk);font-weight:500;margin-top:1px}
+.info-val.empty{color:#ccc;font-style:italic}
+.edit-field{margin-bottom:14px}
+.edit-field label{display:block;font-size:.78rem;font-weight:600;color:var(--dk);margin-bottom:5px}
+.edit-field input{width:100%;padding:11px 15px;border-radius:11px;border:1.5px solid var(--border);font-size:.9rem;font-family:'DM Sans',sans-serif;background:#fafafa;color:var(--dk);outline:none;transition:border .2s}
+.edit-field input:focus{border-color:var(--or);background:#fff;box-shadow:0 0 0 3px rgba(255,87,34,.08)}
+.edit-field input:disabled{opacity:.5;cursor:not-allowed}
+.btn-save{background:var(--or);color:#fff;border:none;padding:12px 26px;border-radius:11px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 14px rgba(255,87,34,.28);display:inline-flex;align-items:center;gap:6px}
+.btn-save:hover{background:var(--or2);transform:translateY(-2px)}
+.qlinks{display:flex;flex-direction:column;gap:9px}
+.qlink{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:13px;border:1.5px solid var(--border);background:#fafafa;text-decoration:none;color:var(--dk);transition:all .2s;font-weight:500;font-size:.9rem}
+.qlink:hover{border-color:var(--or);background:#fff8f5;color:var(--or);text-decoration:none;transform:translateX(4px)}
+.qlink-ic{width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.92rem;flex-shrink:0}
+.qlink-arr{margin-left:auto;color:#ddd;font-size:.8rem}
+.qlink:hover .qlink-arr{color:var(--or)}
+.qlink-logout{border-color:#fecaca;background:#fff8f8;color:#dc2626}
+.qlink-logout:hover{background:#dc2626;color:#fff;border-color:#dc2626}
+.stat-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.smcard{border-radius:13px;padding:14px;text-align:center}
+.sm-n{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1}
+.sm-l{font-size:.72rem;color:var(--gray);margin-top:3px}
+</style>
+
+<div class="prof-hero">
+  <div class="av-wrap">
+    <div class="av">{{ user.username|slice:":1"|upper }}</div>
+    <div class="av-online"></div>
+  </div>
+  <div class="prof-name">{{ user.get_full_name|default:user.username }}</div>
+  <div class="prof-email">{{ user.email|default:"No email set" }}</div>
+  <div class="prof-stats">
+    <div class="ps-item"><div class="ps-n">{{ total_orders }}</div><div class="ps-l">Total Orders</div></div>
+    <div class="ps-item"><div class="ps-n">{{ user.date_joined|date:"Y" }}</div><div class="ps-l">Member Since</div></div>
+    <div class="ps-item"><div class="ps-n">⭐ 4.8</div><div class="ps-l">Your Rating</div></div>
+  </div>
+</div>
+
+<div class="prof-layout">
+  <!-- Account Info -->
+  <div class="pcard" style="animation-delay:.05s">
+    <div class="pcard-title">👤 Account Info</div>
+    <div class="info-row"><div class="info-ic">👤</div><div><div class="info-lbl">Username</div><div class="info-val">{{ user.username }}</div></div></div>
+    <div class="info-row"><div class="info-ic">✉️</div><div><div class="info-lbl">Email</div><div class="info-val {% if not user.email %}empty{% endif %}">{{ user.email|default:"Not set" }}</div></div></div>
+    <div class="info-row"><div class="info-ic">📅</div><div><div class="info-lbl">Member Since</div><div class="info-val">{{ user.date_joined|date:"d M Y" }}</div></div></div>
+    <div class="info-row"><div class="info-ic">🕐</div><div><div class="info-lbl">Last Login</div><div class="info-val">{{ user.last_login|date:"d M Y, h:i A"|default:"N/A" }}</div></div></div>
+  </div>
+
+  <!-- Edit Profile -->
+  <div class="pcard" style="animation-delay:.1s">
+    <div class="pcard-title">✏️ Edit Profile</div>
+    <form method="POST" action="{% url 'profile' %}">
+      {% csrf_token %}
+      <div class="edit-field"><label>First Name</label><input type="text" name="first_name" value="{{ user.first_name }}" placeholder="Your first name"></div>
+      <div class="edit-field"><label>Last Name</label><input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Your last name"></div>
+      <div class="edit-field"><label>Email</label><input type="email" name="email" value="{{ user.email }}" placeholder="your@email.com"></div>
+      <div class="edit-field"><label>Username (cannot change)</label><input type="text" value="{{ user.username }}" disabled></div>
+      <button type="submit" class="btn-save">💾 Save Changes</button>
+    </form>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="pcard" style="animation-delay:.15s">
+    <div class="pcard-title">🔗 Quick Links</div>
+    <div class="qlinks">
+      <a href="{% url 'my_orders' %}" class="qlink"><div class="qlink-ic">📦</div>My Orders<span class="qlink-arr">›</span></a>
+      <a href="{% url 'food_list' %}" class="qlink"><div class="qlink-ic">🍽️</div>Browse Menu<span class="qlink-arr">›</span></a>
+      <a href="{% url 'cart' %}" class="qlink"><div class="qlink-ic">🛒</div>My Cart<span class="qlink-arr">›</span></a>
+      <a href="{% url 'wishlist' %}" class="qlink"><div class="qlink-ic">❤️</div>My Wishlist<span class="qlink-arr">›</span></a>
+      <a href="{% url 'address_list' %}" class="qlink"><div class="qlink-ic">📍</div>Saved Addresses<span class="qlink-arr">›</span></a>
+      <a href="{% url 'forgot_password' %}" class="qlink"><div class="qlink-ic">🔒</div>Change Password<span class="qlink-arr">›</span></a>
+      <a href="{% url 'logout' %}" class="qlink qlink-logout"><div class="qlink-ic" style="border-color:#fecaca;background:#fff8f8">🚪</div>Logout<span style="margin-left:auto;font-size:.8rem">›</span></a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="pcard" style="animation-delay:.2s">
+    <div class="pcard-title">📊 Order Stats</div>
+    <div class="stat-mini-grid">
+      <div class="smcard" style="background:#fafafa;border:1px solid var(--border)"><div class="sm-n" style="color:var(--dk)">{{ total_orders }}</div><div class="sm-l">Total Orders</div></div>
+      <div class="smcard" style="background:#fff8f5;border:1px solid #ffe0cc"><div class="sm-n" style="color:var(--or)">{{ delivered_orders|default:"0" }}</div><div class="sm-l">Delivered</div></div>
+      <div class="smcard" style="background:#f0fdf4;border:1px solid #bbf7d0"><div class="sm-n" style="color:var(--green)">{{ pending_orders|default:"0" }}</div><div class="sm-l">Active</div></div>
+      <div class="smcard" style="background:#fef2f2;border:1px solid #fecaca"><div class="sm-n" style="color:#dc2626">{{ cancelled_orders|default:"0" }}</div><div class="sm-l">Cancelled</div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

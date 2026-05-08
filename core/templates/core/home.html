@@ -1,0 +1,935 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── BASE RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Override body for this page */
+body {
+  background: #FFF8F2 !important;
+  font-family: 'DM Sans', sans-serif;
+}
+.content-wrap { background: #FFF8F2 !important; padding: 0 !important; }
+.footer-custom { margin-top: 0 !important; }
+
+:root {
+  --or: #FF5722;
+  --or2: #FF7043;
+  --dk: #1a1a1a;
+  --cream: #FFF8F2;
+  --warm: #FFF0E6;
+  --gray: #6b7280;
+  --light: #f9fafb;
+  --border: #e5e7eb;
+}
+
+/* ════════════════════════════════
+   HERO SECTION
+════════════════════════════════ */
+.hero {
+  min-height: calc(100vh - 68px);
+  background: linear-gradient(135deg, #FFF8F2 0%, #FFE8D6 50%, #FFF0E6 100%);
+  display: flex;
+  align-items: center;
+  padding: 40px 6vw;
+  position: relative;
+  overflow: hidden;
+  gap: 40px;
+}
+
+/* decorative circles */
+.hero-circle1 {
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,87,34,.12), transparent 70%);
+  top: -100px; right: -100px;
+  animation: pulse 4s ease-in-out infinite;
+}
+.hero-circle2 {
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,193,7,.15), transparent 70%);
+  bottom: -80px; left: 10%;
+  animation: pulse 5s .5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { transform: scale(1); opacity: .8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* LEFT */
+.hero-left {
+  flex: 1;
+  min-width: 280px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,87,34,.1);
+  border: 1.5px solid rgba(255,87,34,.25);
+  color: var(--or); padding: 7px 18px; border-radius: 99px;
+  font-size: .74rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 24px;
+  animation: fadeUp .7s .1s ease both;
+}
+.tag-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--or);
+  animation: blink 1.3s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.hero-h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  line-height: 1.06;
+  color: var(--dk);
+  margin-bottom: 20px;
+  animation: fadeUp .8s .2s ease both;
+}
+.hero-h1 .orange {
+  color: var(--or);
+  font-style: italic;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--gray);
+  line-height: 1.8;
+  max-width: 440px;
+  margin-bottom: 36px;
+  font-weight: 300;
+  animation: fadeUp .8s .32s ease both;
+}
+
+.hero-btns {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  animation: fadeUp .8s .44s ease both;
+}
+.btn-orange {
+  background: var(--or); color: #fff;
+  padding: 15px 34px; border-radius: 14px;
+  font-weight: 700; font-size: .96rem;
+  text-decoration: none; transition: all .25s;
+  box-shadow: 0 6px 20px rgba(255,87,34,.35);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-orange:hover {
+  background: var(--or2); color: #fff;
+  text-decoration: none; transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(255,87,34,.45);
+}
+.btn-outline {
+  background: #fff; color: var(--dk);
+  padding: 15px 34px; border-radius: 14px;
+  font-weight: 600; font-size: .96rem;
+  text-decoration: none; transition: all .25s;
+  border: 2px solid var(--border);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-outline:hover {
+  border-color: var(--or); color: var(--or);
+  text-decoration: none; transform: translateY(-3px);
+}
+
+/* mini stats under buttons */
+.hero-mini-stats {
+  display: flex; gap: 24px; flex-wrap: wrap;
+  margin-top: 36px;
+  animation: fadeUp .8s .56s ease both;
+}
+.mstat { display: flex; align-items: center; gap: 8px; }
+.mstat-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.mstat-n { font-weight: 700; font-size: .96rem; color: var(--dk); line-height: 1; }
+.mstat-l { font-size: .74rem; color: var(--gray); margin-top: 1px; }
+
+/* RIGHT — Food Image Collage */
+.hero-right {
+  flex: 1;
+  min-width: 280px;
+  position: relative;
+  height: 500px;
+  z-index: 2;
+  animation: fadeLeft .9s .3s ease both;
+}
+
+.food-collage { position: relative; width: 100%; height: 100%; }
+
+/* food image cards */
+.fcol {
+  position: absolute;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,.15);
+  transition: transform .3s ease;
+}
+.fcol img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fcol:hover { transform: translateY(-8px) scale(1.02); }
+
+.fcol1 { width: 200px; height: 220px; top: 0; left: 10%; animation: float1 3.5s ease-in-out infinite; }
+.fcol2 { width: 170px; height: 190px; top: 30px; right: 5%; animation: float2 4s .5s ease-in-out infinite; }
+.fcol3 { width: 180px; height: 200px; bottom: 20px; left: 0; animation: float3 3.8s 1s ease-in-out infinite; }
+.fcol4 { width: 160px; height: 175px; bottom: 10px; right: 15%; animation: float4 4.2s 1.5s ease-in-out infinite; }
+
+@keyframes float1 { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-14px) rotate(-2deg)} }
+@keyframes float2 { 0%,100%{transform:translateY(0) rotate(2deg)} 50%{transform:translateY(-18px) rotate(2deg)} }
+@keyframes float3 { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-12px) rotate(-1deg)} }
+@keyframes float4 { 0%,100%{transform:translateY(0) rotate(3deg)} 50%{transform:translateY(-16px) rotate(3deg)} }
+
+/* label on food card */
+.fcol-label {
+  position: absolute; bottom: 12px; left: 12px; right: 12px;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(8px);
+  border-radius: 10px; padding: 8px 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.fcol-name { font-size: .78rem; font-weight: 700; color: var(--dk); }
+.fcol-price { font-size: .78rem; font-weight: 700; color: var(--or); }
+
+/* center badge */
+.hero-center-badge {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--or);
+  color: #fff; border-radius: 50%;
+  width: 80px; height: 80px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 700; font-size: .72rem; text-align: center;
+  box-shadow: 0 8px 24px rgba(255,87,34,.45);
+  z-index: 10;
+  animation: badgeSpin 10s linear infinite;
+  line-height: 1.3;
+}
+@keyframes badgeSpin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+.hero-center-badge span { display: block; font-size: 1.4rem; font-weight: 900; line-height: 1; }
+
+/* ENTER animations */
+@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeLeft { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+
+/* ════════════════════════════════
+   CATEGORY SCROLLBAR
+════════════════════════════════ */
+.cat-section { padding: 48px 6vw 8px; background: #FFF8F2; }
+.cat-section h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; color: var(--dk);
+  margin-bottom: 20px;
+}
+.cat-scroll {
+  display: flex; gap: 12px; overflow-x: auto;
+  padding-bottom: 8px; scrollbar-width: none;
+}
+.cat-scroll::-webkit-scrollbar { display: none; }
+
+.cat-pill {
+  flex-shrink: 0;
+  background: #fff; border: 2px solid var(--border);
+  border-radius: 99px; padding: 10px 22px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: .88rem; font-weight: 600; color: var(--gray);
+  text-decoration: none; transition: all .22s;
+  white-space: nowrap; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.cat-pill:hover, .cat-pill.active {
+  background: var(--or); border-color: var(--or);
+  color: #fff; text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255,87,34,.3);
+}
+.cat-pill .ci {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255,87,34,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; transition: background .22s;
+}
+.cat-pill:hover .ci, .cat-pill.active .ci { background: rgba(255,255,255,.2); }
+
+/* ════════════════════════════════
+   SEARCH BAR
+════════════════════════════════ */
+.search-section { padding: 32px 6vw 16px; }
+.search-box {
+  max-width: 560px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  display: flex; align-items: center;
+  gap: 10px; padding: 6px 6px 6px 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.06);
+  transition: border .2s, box-shadow .2s;
+}
+.search-box:focus-within {
+  border-color: var(--or);
+  box-shadow: 0 4px 20px rgba(255,87,34,.12);
+}
+.search-box input {
+  flex: 1; border: none; outline: none;
+  font-size: .96rem; font-family: 'DM Sans', sans-serif;
+  color: var(--dk); background: none; padding: 10px 0;
+}
+.search-box input::placeholder { color: #bbb; }
+.search-box button {
+  background: var(--or); color: #fff; border: none;
+  padding: 12px 22px; border-radius: 12px;
+  font-weight: 700; font-size: .9rem; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all .2s;
+  white-space: nowrap;
+}
+.search-box button:hover { background: var(--or2); transform: scale(1.03); }
+
+/* ════════════════════════════════
+   FOOD GRID
+════════════════════════════════ */
+.food-section { padding: 20px 5vw 60px; }
+
+.food-section-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.food-section-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem); color: var(--dk);
+}
+.food-section-header h2 span { color: var(--or); }
+.see-all {
+  color: var(--or); font-weight: 600; font-size: .88rem;
+  text-decoration: none; display: flex; align-items: center; gap: 5px;
+  padding: 8px 16px; border-radius: 99px; border: 1.5px solid rgba(255,87,34,.25);
+  transition: all .2s;
+}
+.see-all:hover {
+  background: var(--or); color: #fff; text-decoration: none;
+  border-color: var(--or);
+}
+
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+/* ── FOOD CARD ── */
+.fcard {
+  background: #fff;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07);
+  transition: all .35s cubic-bezier(.25,.8,.25,1);
+  position: relative;
+  border: 1.5px solid transparent;
+}
+.fcard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 44px rgba(0,0,0,.12);
+  border-color: rgba(255,87,34,.15);
+}
+
+.fcard-img {
+  position: relative;
+  height: 195px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+}
+.fcard-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .45s ease;
+  display: block;
+}
+.fcard:hover .fcard-img img { transform: scale(1.08); }
+
+.fcard-cat {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(255,255,255,.93); backdrop-filter: blur(6px);
+  padding: 4px 12px; border-radius: 99px;
+  font-size: .66rem; font-weight: 700;
+  color: var(--or); letter-spacing: .06em; text-transform: uppercase;
+}
+
+.fcard-badge {
+  position: absolute; top: 12px; right: 48px;
+  background: #FF5722; color: #fff;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: .62rem; font-weight: 700;
+  letter-spacing: .05em;
+}
+
+.fcard-heart {
+  position: absolute; top: 10px; right: 10px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,.93); backdrop-filter: blur(6px);
+  border: none; cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+.fcard-heart:hover { transform: scale(1.2); }
+.fcard-heart.wishlisted { background: #fff0f3; }
+
+.fcard-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.3);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .28s;
+}
+.fcard:hover .fcard-overlay { opacity: 1; }
+.btn-qadd {
+  background: #fff; color: var(--dk);
+  padding: 11px 24px; border-radius: 99px;
+  font-weight: 700; font-size: .86rem; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  display: flex; align-items: center; gap: 6px;
+  transform: translateY(10px);
+  transition: transform .3s cubic-bezier(.23,.98,.28,.99), background .2s, color .2s;
+}
+.fcard:hover .btn-qadd { transform: translateY(0); }
+.btn-qadd:hover { background: var(--or); color: #fff; }
+
+.fcard-body { padding: 16px 18px 20px; }
+.fcard-row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 5px; }
+.fcard-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.08rem; font-weight: 700; color: var(--dk);
+  line-height: 1.3;
+}
+.fcard-rating {
+  display: flex; align-items: center; gap: 3px;
+  background: #FFF8F2; border: 1px solid #FFE0CC;
+  padding: 3px 8px; border-radius: 99px;
+  font-size: .72rem; font-weight: 700; color: var(--or);
+  flex-shrink: 0;
+}
+.fcard-desc {
+  font-size: .81rem; color: var(--gray);
+  line-height: 1.55; margin-bottom: 14px;
+}
+.fcard-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #f5f5f5; padding-top: 13px;
+}
+.fcard-price { font-size: 1.2rem; font-weight: 700; color: var(--dk); }
+.fcard-price sup { font-size: .68rem; color: var(--gray); vertical-align: super; }
+.btn-add {
+  background: var(--dk); color: #fff; border: none;
+  padding: 9px 18px; border-radius: 10px;
+  font-size: .82rem; font-weight: 700; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all .22s;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-add:hover { background: var(--or); transform: scale(1.05); }
+.btn-add.ok { background: #16a34a !important; }
+
+/* ════════════════════════════════
+   HOW IT WORKS
+════════════════════════════════ */
+.how-section {
+  background: var(--dk);
+  padding: 72px 6vw;
+}
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px; margin-top: 44px;
+}
+.how-card {
+  text-align: center; padding: 32px 20px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px;
+  transition: all .3s;
+  position: relative;
+}
+.how-card:hover {
+  background: rgba(255,87,34,.1);
+  border-color: rgba(255,87,34,.25);
+  transform: translateY(-6px);
+}
+.how-num {
+  position: absolute; top: -12px; left: 50%;
+  transform: translateX(-50%);
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--or); color: #fff;
+  font-size: .72rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.how-icon { font-size: 2.4rem; margin-bottom: 14px; display: block; }
+.how-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #fff; margin-bottom: 8px; }
+.how-desc { font-size: .8rem; color: rgba(255,255,255,.5); line-height: 1.65; }
+
+/* ════════════════════════════════
+   FEATURES — HORIZONTAL CARDS
+════════════════════════════════ */
+.feat-section { padding: 72px 5vw; background: #FFF8F2; }
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px; margin-top: 40px;
+}
+.feat-card {
+  background: #fff; border-radius: 20px; padding: 28px;
+  border: 1.5px solid var(--border);
+  transition: all .3s; position: relative; overflow: hidden;
+}
+.feat-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--or), var(--or2));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .3s;
+}
+.feat-card:hover { transform: translateY(-5px); box-shadow: 0 16px 36px rgba(0,0,0,.09); border-color: rgba(255,87,34,.2); }
+.feat-card:hover::before { transform: scaleX(1); }
+.feat-icon { font-size: 2.2rem; margin-bottom: 14px; display: block; }
+.feat-title { font-family: 'Playfair Display', serif; font-size: 1.08rem; color: var(--dk); margin-bottom: 8px; }
+.feat-desc { font-size: .82rem; color: var(--gray); line-height: 1.65; }
+
+/* ════════════════════════════════
+   PROMO BANNER
+════════════════════════════════ */
+.promo {
+  margin: 0 4vw 72px;
+  background: linear-gradient(135deg, var(--or) 0%, #bf360c 100%);
+  border-radius: 28px; padding: 60px 8vw;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 24px; flex-wrap: wrap; overflow: hidden; position: relative;
+}
+.promo::before {
+  content: '🍕'; position: absolute; right: 5%; top: 50%;
+  transform: translateY(-50%); font-size: 9rem; opacity: .1;
+  animation: ctaBob 4s ease-in-out infinite;
+}
+@keyframes ctaBob { 0%,100%{transform:translateY(-50%) rotate(-8deg)} 50%{transform:translateY(calc(-50% - 14px)) rotate(4deg)} }
+.promo-text h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 2.8vw, 2.4rem); color: #fff; margin-bottom: 7px; }
+.promo-text p { color: rgba(255,255,255,.75); font-size: .96rem; }
+.btn-promo {
+  background: #fff; color: var(--or);
+  padding: 16px 36px; border-radius: 14px; font-weight: 700;
+  font-size: .96rem; text-decoration: none; white-space: nowrap;
+  transition: all .25s; box-shadow: 0 6px 20px rgba(0,0,0,.15);
+  display: inline-flex; align-items: center; gap: 7px; position: relative;
+}
+.btn-promo:hover { transform: translateY(-3px) scale(1.03); color: var(--or); text-decoration: none; box-shadow: 0 10px 28px rgba(0,0,0,.2); }
+
+/* ════════════════════════════════
+   SECTION HEADER
+════════════════════════════════ */
+.sh { padding: 60px 6vw 28px; }
+.sh-eye { font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--or); margin-bottom: 8px; }
+.sh-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); color: var(--dk); }
+.sh-title span { color: var(--or); }
+
+/* ════════════════════════════════
+   TOAST
+════════════════════════════════ */
+.hp-toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(70px);
+  background: var(--dk); color: #fff;
+  padding: 13px 22px; border-radius: 14px;
+  font-size: .9rem; font-weight: 600;
+  box-shadow: 0 8px 28px rgba(0,0,0,.2);
+  z-index: 9999; opacity: 0; pointer-events: none;
+  transition: transform .38s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+  display: flex; align-items: center; gap: 10px; white-space: nowrap;
+}
+.hp-toast.on { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast-n {
+  background: var(--or); color: #fff; font-size: .68rem; font-weight: 700;
+  min-width: 20px; height: 20px; border-radius: 99px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════ */
+.sr { opacity: 0; transform: translateY(26px); transition: opacity .6s ease, transform .6s ease; }
+.sr.in { opacity: 1; transform: translateY(0); }
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media (max-width: 860px) {
+  .hero { flex-direction: column; text-align: center; min-height: auto; padding: 40px 6vw 60px; }
+  .hero-right { height: 320px; width: 100%; }
+  .hero-sub, .hero-mini-stats { justify-content: center; }
+  .hero-btns { justify-content: center; }
+}
+@media (max-width: 640px) {
+  .food-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fcard-img { height: 150px; }
+  .fcard-overlay { display: none; }
+  .promo { text-align: center; justify-content: center; }
+  .promo::before { display: none; }
+  .fcol1 { width: 150px; height: 165px; }
+  .fcol2 { width: 130px; height: 145px; }
+  .fcol3 { width: 140px; height: 155px; }
+  .fcol4 { width: 120px; height: 135px; }
+}
+@media (max-width: 380px) {
+  .food-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-circle1"></div>
+  <div class="hero-circle2"></div>
+
+  <!-- LEFT -->
+  <div class="hero-left">
+    <div class="hero-tag">
+      <span class="tag-dot"></span>
+      Now delivering near you
+    </div>
+
+    <h1 class="hero-h1">
+      Fresh Food,<br>
+      <span class="orange">Delivered Fast</span><br>
+      To Your Door 🚀
+    </h1>
+
+    <p class="hero-sub">
+      Order from the best local kitchen — fresh ingredients, blazing fast delivery, and flavours you'll love every time.
+    </p>
+
+    <div class="hero-btns">
+      <a href="{% url 'food_list' %}" class="btn-orange">🍽️ &nbsp;Order Now</a>
+      <a href="{% url 'my_orders' %}" class="btn-outline">📦 &nbsp;Track Order</a>
+    </div>
+
+    <div class="hero-mini-stats">
+      <div class="mstat">
+        <div class="mstat-icon">⭐</div>
+        <div><div class="mstat-n">4.8</div><div class="mstat-l">Rating</div></div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-icon">🚀</div>
+        <div><div class="mstat-n">30 min</div><div class="mstat-l">Avg delivery</div></div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-icon">😊</div>
+        <div><div class="mstat-n">500+</div><div class="mstat-l">Customers</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — food image collage -->
+  <div class="hero-right">
+    <div class="food-collage">
+
+      <div class="fcol fcol1">
+        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80" alt="Burger">
+        <div class="fcol-label">
+          <span class="fcol-name">Smash Burger</span>
+          <span class="fcol-price">₹199</span>
+        </div>
+      </div>
+
+      <div class="fcol fcol2">
+        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80" alt="Pizza">
+        <div class="fcol-label">
+          <span class="fcol-name">Pepperoni Pizza</span>
+          <span class="fcol-price">₹299</span>
+        </div>
+      </div>
+
+      <div class="fcol fcol3">
+        <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&q=80" alt="Biryani">
+        <div class="fcol-label">
+          <span class="fcol-name">Chicken Biryani</span>
+          <span class="fcol-price">₹249</span>
+        </div>
+      </div>
+
+      <div class="fcol fcol4">
+        <img src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80" alt="Noodles">
+        <div class="fcol-label">
+          <span class="fcol-name">Spicy Noodles</span>
+          <span class="fcol-price">₹179</span>
+        </div>
+      </div>
+
+      <div class="hero-center-badge">
+        <span>50+</span>
+        Dishes
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══ SEARCH ══ -->
+<div class="search-section sr">
+  <div class="search-box">
+    <span style="font-size:1.1rem;opacity:.4">🔍</span>
+    <form method="GET" action="{% url 'food_list' %}" style="display:contents">
+      <input type="text" name="q" placeholder="Search pizza, biryani, burger...">
+      <button type="submit">Search →</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- ══ CATEGORIES ══ -->
+<div class="cat-section sr">
+  <h3>Browse by Category</h3>
+  <div class="cat-scroll">
+    <a href="{% url 'food_list' %}" class="cat-pill active">
+      <span class="ci">🍽️</span> All Items
+    </a>
+    {% for cat in categories %}
+    <a href="{% url 'food_list' %}?category={{ cat.id }}" class="cat-pill">
+      <span class="ci">
+        {% if "pizza" in cat.name|lower %}🍕
+        {% elif "burger" in cat.name|lower %}🍔
+        {% elif "biryani" in cat.name|lower or "rice" in cat.name|lower %}🍛
+        {% elif "drink" in cat.name|lower or "juice" in cat.name|lower %}🥤
+        {% elif "dessert" in cat.name|lower or "sweet" in cat.name|lower %}🍰
+        {% elif "chinese" in cat.name|lower or "noodle" in cat.name|lower %}🍜
+        {% elif "indian" in cat.name|lower %}🍲
+        {% elif "chicken" in cat.name|lower %}🍗
+        {% else %}🍽️{% endif %}
+      </span>
+      {{ cat.name }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+
+<!-- ══ POPULAR DISHES ══ -->
+<div class="sh sr">
+  <div class="sh-eye">✨ Handpicked for you</div>
+  <h2 class="sh-title">Popular <span>Dishes</span></h2>
+</div>
+
+<div class="food-section">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+    <a href="{% url 'food_list' %}" class="see-all">View All Menu →</a>
+  </div>
+
+  <div class="food-grid">
+    {% for food in foods %}
+    <div class="fcard sr" style="transition-delay:{{ forloop.counter0 }}50ms">
+
+      <div class="fcard-img">
+        {% if food.image %}
+          <img src="{{ food.image.url }}" alt="{{ food.name }}" loading="lazy">
+        {% else %}
+          <img src="https://source.unsplash.com/600x420/?{{ food.name|urlencode }},food,dish"
+               alt="{{ food.name }}" loading="lazy"
+               onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80'">
+        {% endif %}
+
+        <span class="fcard-cat">{{ food.category.name }}</span>
+        {% if forloop.counter <= 3 %}<span class="fcard-badge">🔥 Popular</span>{% endif %}
+
+        <button class="fcard-heart wl-toggle" data-id="{{ food.id }}">🤍</button>
+
+        <div class="fcard-overlay">
+          <button class="btn-qadd hp-ajax" data-id="{{ food.id }}" data-name="{{ food.name }}">
+            🛒 Quick Add
+          </button>
+        </div>
+      </div>
+
+      <div class="fcard-body">
+        <div class="fcard-row1">
+          <h3 class="fcard-name">{{ food.name }}</h3>
+          <div class="fcard-rating">⭐ {{ food.avg_rating|default:"4.5" }}</div>
+        </div>
+        <p class="fcard-desc">{{ food.description|truncatewords:12|default:"Freshly prepared with finest ingredients, served hot." }}</p>
+        <div class="fcard-foot">
+          <div class="fcard-price"><sup>₹</sup>{{ food.price }}</div>
+          <button class="btn-add hp-ajax" data-id="{{ food.id }}" data-name="{{ food.name }}">＋ Add</button>
+        </div>
+      </div>
+
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--gray);">
+      <div style="font-size:3rem;margin-bottom:12px;">🍽️</div>
+      <p style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--dk);">No dishes yet — add from admin!</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+<!-- ══ HOW IT WORKS ══ -->
+<div class="how-section sr">
+  <div style="text-align:center;">
+    <div style="font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--or);margin-bottom:10px;">Simple process</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);color:#fff;margin:0;">How It <span style="color:var(--or);">Works</span></h2>
+  </div>
+  <div class="how-grid">
+    <div class="how-card sr" style="transition-delay:.05s">
+      <div class="how-num">1</div>
+      <span class="how-icon">🍽️</span>
+      <h3 class="how-title">Browse Menu</h3>
+      <p class="how-desc">Explore fresh dishes curated daily by our expert chefs.</p>
+    </div>
+    <div class="how-card sr" style="transition-delay:.1s">
+      <div class="how-num">2</div>
+      <span class="how-icon">🛒</span>
+      <h3 class="how-title">Add to Cart</h3>
+      <p class="how-desc">Pick your favourites and add them in one tap, instantly.</p>
+    </div>
+    <div class="how-card sr" style="transition-delay:.15s">
+      <div class="how-num">3</div>
+      <span class="how-icon">💳</span>
+      <h3 class="how-title">Pay Easily</h3>
+      <p class="how-desc">UPI, Cards, COD — multiple payment options available.</p>
+    </div>
+    <div class="how-card sr" style="transition-delay:.2s">
+      <div class="how-num">4</div>
+      <span class="how-icon">🛵</span>
+      <h3 class="how-title">Fast Delivery</h3>
+      <p class="how-desc">Hot food at your door in under 30 minutes, guaranteed.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ FEATURES ══ -->
+<div class="feat-section sr">
+  <div style="text-align:center;margin-bottom:4px;">
+    <div class="sh-eye">Why choose us</div>
+    <h2 class="sh-title">We Make It <span>Special</span></h2>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card sr" style="transition-delay:.05s">
+      <span class="feat-icon">🚀</span>
+      <h3 class="feat-title">30 Min Delivery</h3>
+      <p class="feat-desc">Hot food at your door in under 30 minutes, every single time — no excuses.</p>
+    </div>
+    <div class="feat-card sr" style="transition-delay:.1s">
+      <span class="feat-icon">🌿</span>
+      <h3 class="feat-title">100% Fresh</h3>
+      <p class="feat-desc">Ingredients sourced fresh daily from local markets. No frozen shortcuts.</p>
+    </div>
+    <div class="feat-card sr" style="transition-delay:.15s">
+      <span class="feat-icon">💳</span>
+      <h3 class="feat-title">Secure Payment</h3>
+      <p class="feat-desc">Razorpay powered. UPI, Cards, NetBanking — all options, fully secure.</p>
+    </div>
+    <div class="feat-card sr" style="transition-delay:.2s">
+      <span class="feat-icon">📞</span>
+      <h3 class="feat-title">24/7 Support</h3>
+      <p class="feat-desc">Our team is always ready to help you with any order, any time.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ CTA PROMO ══ -->
+<div class="promo sr">
+  <div class="promo-text">
+    <h2>Hungry? Let's Go! 🎉</h2>
+    <p>Explore our full menu and find your next favourite meal.</p>
+  </div>
+  <a href="{% url 'food_list' %}" class="btn-promo">🍽️ &nbsp;See Full Menu →</a>
+</div>
+
+
+<!-- Toast -->
+<div class="hp-toast" id="hpToast">
+  🛒 <span id="hpToastMsg">Added!</span>
+  <span class="toast-n" id="hpToastN">0</span>
+</div>
+
+
+<script>
+(function(){
+  let toastTmr;
+
+  function toast(msg, count) {
+    const el = document.getElementById('hpToast');
+    document.getElementById('hpToastMsg').textContent = msg;
+    document.getElementById('hpToastN').textContent = count || '';
+    el.classList.add('on');
+    clearTimeout(toastTmr);
+    toastTmr = setTimeout(() => el.classList.remove('on'), 2800);
+  }
+
+  function updateBadge(n) {
+    let b = document.querySelector('.cart-badge');
+    if (!b && n > 0) {
+      const a = document.querySelector('a[href="/cart/"]');
+      if (a) { b = document.createElement('span'); b.className = 'cart-badge'; a.appendChild(b); }
+    }
+    if (b) b.textContent = n;
+  }
+
+  /* Add to cart */
+  document.querySelectorAll('.hp-ajax').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const id = this.dataset.id, name = this.dataset.name;
+      const orig = this.innerHTML;
+      this.disabled = true; this.style.opacity = '.6';
+
+      fetch('/add-to-cart/' + id + '/', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => r.json())
+      .then(d => {
+        this.disabled = false; this.style.opacity = '1';
+        this.classList.add('ok'); this.innerHTML = '✓ Added!';
+        toast(name + ' added', d.cart_count);
+        updateBadge(d.cart_count);
+        setTimeout(() => { this.classList.remove('ok'); this.innerHTML = orig; }, 1800);
+      })
+      .catch(() => window.location.href = '/add-to-cart/' + id + '/');
+    });
+  });
+
+  /* Wishlist */
+  document.querySelectorAll('.wl-toggle').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const id = this.dataset.id, self = this;
+      fetch('/wishlist/toggle/' + id + '/', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.wishlisted) { self.textContent = '❤️'; self.classList.add('wishlisted'); toast('Added to wishlist!', '❤️'); }
+        else { self.textContent = '🤍'; self.classList.remove('wishlisted'); toast('Removed from wishlist', ''); }
+      });
+    });
+  });
+
+  /* Scroll reveal */
+  const els = document.querySelectorAll('.sr');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  els.forEach(el => io.observe(el));
+  window.addEventListener('load', () => {
+    els.forEach(el => { if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('in'); });
+  });
+})();
+</script>
+
+{% endblock %}

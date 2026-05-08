@@ -1,0 +1,157 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#FFF8F2!important}
+.content-wrap{background:#FFF8F2!important;padding:0!important}
+:root{--or:#FF5722;--or2:#FF7043;--dk:#1a1a1a;--cream:#FFF8F2;--gray:#6b7280;--border:#e5e7eb;--green:#16a34a}
+.pg-header{background:linear-gradient(135deg,#1a1a1a,#1a0800);padding:40px 6vw 34px;position:relative;overflow:hidden}
+.pg-header::after{content:'💳';position:absolute;right:6vw;top:50%;transform:translateY(-50%);font-size:6rem;opacity:.08}
+.pg-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.4rem);color:#fff;margin-bottom:4px}
+.pg-header h1 span{color:var(--or)}
+.pg-header p{color:rgba(255,255,255,.5);font-size:.9rem;margin:0}
+/* steps */
+.checkout-steps{display:flex;align-items:center;justify-content:center;gap:0;padding:22px 6vw 0}
+.cstep{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;max-width:120px}
+.cs-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;border:2px solid;z-index:1;transition:all .3s}
+.cs-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.cs-dot.active{background:var(--or);border-color:var(--or);color:#fff;box-shadow:0 4px 12px rgba(255,87,34,.3)}
+.cs-dot.wait{background:#f9fafb;border-color:var(--border);color:#bbb}
+.cs-lbl{font-size:.7rem;color:var(--gray);font-weight:500;text-align:center}
+.cstep.active .cs-lbl{color:var(--or);font-weight:700}
+.cstep.done .cs-lbl{color:var(--green)}
+.cs-line{flex:1;height:2px;background:var(--border);margin-top:-22px;max-width:80px;transition:background .3s}
+.cs-line.done{background:var(--green)}
+/* layout */
+.co-layout{display:grid;grid-template-columns:1fr 360px;gap:24px;padding:28px 5vw 60px;align-items:start}
+@media(max-width:860px){.co-layout{grid-template-columns:1fr}}
+.form-card{background:#fff;border-radius:20px;padding:28px;box-shadow:0 2px 14px rgba(0,0,0,.07)}
+.fc-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dk);margin-bottom:20px;padding-bottom:13px;border-bottom:1.5px solid #f0f0f0;display:flex;align-items:center;gap:8px}
+/* saved addresses */
+.saved-addr{border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .2s;background:#fafafa;margin-bottom:9px}
+.saved-addr:hover{border-color:var(--or);background:#fff8f5}
+.saved-addr.selected{border-color:var(--or);background:#fff8f5;box-shadow:0 2px 10px rgba(255,87,34,.1)}
+/* input */
+.ig{margin-bottom:15px}
+.ig label{display:block;font-size:.78rem;font-weight:600;color:var(--dk);margin-bottom:5px}
+.ig input,.ig textarea{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);font-size:.91rem;font-family:'DM Sans',sans-serif;background:#fafafa;color:var(--dk);outline:none;transition:border .2s,box-shadow .2s}
+.ig input:focus,.ig textarea:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(255,87,34,.1);background:#fff}
+.ig input.valid{border-color:var(--green)}
+.ig textarea{min-height:90px;resize:vertical}
+/* payment options */
+.pay-opts{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:6px}
+.pay-opt{flex:1;min-width:100px;border:1.5px solid var(--border);border-radius:12px;padding:13px 10px;cursor:pointer;text-align:center;transition:all .2s;background:#fafafa;color:var(--gray);font-size:.82rem;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:5px}
+.pay-opt:hover{border-color:var(--or);background:#fff8f5;color:var(--dk)}
+.pay-opt.selected{border-color:var(--or);background:#fff3ef;color:var(--or);box-shadow:0 2px 10px rgba(255,87,34,.12)}
+.pay-opt .pi{font-size:1.3rem}
+.btn-order{display:block;width:100%;background:var(--or);color:#fff;padding:15px;border-radius:13px;font-weight:700;font-size:.98rem;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s;box-shadow:0 5px 18px rgba(255,87,34,.3);margin-top:6px}
+.btn-order:hover{background:var(--or2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,87,34,.4)}
+/* summary */
+.sum-card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,.08);position:sticky;top:88px}
+.sum-title{font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:700;color:var(--dk);margin-bottom:16px;padding-bottom:13px;border-bottom:1.5px solid #f0f0f0}
+.sum-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f7f7f7}
+.sum-item:last-of-type{border-bottom:none}
+.si-thumb{width:42px;height:42px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#FFF3E0,#FFE0B2);flex-shrink:0}
+.si-thumb img{width:100%;height:100%;object-fit:cover}
+.si-name{font-size:.84rem;font-weight:600;color:var(--dk);flex:1}
+.si-qty{font-size:.74rem;color:var(--gray);margin-top:1px}
+.si-price{font-size:.9rem;font-weight:700;color:var(--dk);flex-shrink:0}
+hr.sdiv{border:none;border-top:1.5px solid #f0f0f0;margin:12px 0}
+.srow{display:flex;justify-content:space-between;font-size:.85rem;color:var(--gray);padding:4px 0}
+.srow.stotal{font-size:1.05rem;font-weight:700;color:var(--dk);border-top:1.5px solid #f0f0f0;padding-top:12px;margin-top:6px}
+.srow.stotal span:last-child{color:var(--or);font-size:1.15rem}
+.del-badge{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:9px 13px;margin:12px 0;font-size:.8rem;color:var(--green);font-weight:500;display:flex;align-items:center;gap:7px}
+.sec-note{display:flex;align-items:center;justify-content:center;gap:5px;font-size:.74rem;color:var(--gray);margin-top:12px}
+.err-msg{background:#fff0f0;border:1px solid #fecaca;border-radius:11px;padding:10px 14px;color:#dc2626;font-size:.86rem;font-weight:500;margin-bottom:15px;display:flex;align-items:center;gap:7px}
+.sr{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.sr.in{opacity:1;transform:translateY(0)}
+</style>
+
+<div class="pg-header">
+  <h1>Almost <span>There!</span></h1>
+  <p>Fill in your delivery details and place your order</p>
+</div>
+
+<!-- STEPS -->
+<div class="checkout-steps">
+  <div class="cstep done"><div class="cs-dot done">✓</div><div class="cs-lbl">Cart</div></div>
+  <div class="cs-line done"></div>
+  <div class="cstep active"><div class="cs-dot active">2</div><div class="cs-lbl">Delivery</div></div>
+  <div class="cs-line"></div>
+  <div class="cstep"><div class="cs-dot wait">3</div><div class="cs-lbl">Confirm</div></div>
+</div>
+
+<div class="co-layout">
+  <div>
+    <div class="form-card sr">
+      {% for message in messages %}<div class="err-msg">❌ &nbsp;{{ message }}</div>{% endfor %}
+
+      <!-- Saved addresses -->
+      {% if saved_addresses %}
+      <div class="fc-title">📍 Saved Addresses</div>
+      {% for addr in saved_addresses %}
+      <div class="saved-addr {% if addr.is_default %}selected{% endif %}" onclick="fillAddr(this)" data-name="{{ addr.full_name }}" data-phone="{{ addr.phone }}" data-address="{{ addr.address }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:.7rem;font-weight:700;background:var(--or);color:#fff;padding:2px 10px;border-radius:99px;text-transform:uppercase">{{ addr.label }}</span>
+          {% if addr.is_default %}<span style="font-size:.7rem;font-weight:700;background:var(--green);color:#fff;padding:2px 10px;border-radius:99px">Default</span>{% endif %}
+        </div>
+        <div style="font-weight:600;font-size:.88rem;color:var(--dk)">{{ addr.full_name }}</div>
+        <div style="font-size:.78rem;color:var(--gray)">{{ addr.phone }} · {{ addr.address|truncatechars:50 }}</div>
+      </div>
+      {% endfor %}
+      <a href="{% url 'address_add' %}?next=checkout" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:12px;border:1.5px dashed var(--border);color:var(--gray);font-size:.84rem;font-weight:600;text-decoration:none;transition:all .2s;margin-bottom:20px" onmouseover="this.style.borderColor='#FF5722';this.style.color='#FF5722'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#6b7280'">＋ Add New Address</a>
+      {% endif %}
+
+      <form method="POST" id="coForm">
+        {% csrf_token %}
+        <div class="fc-title">📋 Delivery Details</div>
+        <div class="ig"><label>Full Name</label><input type="text" name="name" id="nameInput" placeholder="Enter your full name" required autocomplete="name"></div>
+        <div class="ig"><label>Phone Number</label><input type="tel" name="phone" id="phoneInput" placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required autocomplete="tel"></div>
+        <div class="ig"><label>Delivery Address</label><textarea name="address" id="addressInput" placeholder="House/Flat no., Street, Area, City, Pincode" required></textarea></div>
+
+        <div class="fc-title" style="margin-top:20px">💳 Payment Method</div>
+        <div class="pay-opts" id="payOpts">
+          <div class="pay-opt selected" data-val="cod" onclick="selPay(this)"><span class="pi">💵</span>Cash on Delivery</div>
+          <div class="pay-opt" data-val="razorpay" onclick="selPay(this)"><span class="pi">📲</span>UPI / Card</div>
+        </div>
+        <input type="hidden" name="payment_method" id="payInput" value="cod">
+
+        <button type="submit" class="btn-order" id="placeBtn">🚀 &nbsp;Place Order — ₹{{ final_total|floatformat:0 }}</button>
+      </form>
+    </div>
+  </div>
+
+  <div>
+    <div class="sum-card sr" style="transition-delay:.1s">
+      <div class="sum-title">🧾 Order Summary</div>
+      {% for item in items %}
+      <div class="sum-item">
+        <div class="si-thumb">
+          {% if item.food.image %}<img src="{{ item.food.image.url }}" alt="{{ item.food.name }}">
+          {% else %}<img src="https://source.unsplash.com/84x84/?{{ item.food.name|urlencode }},food" alt="{{ item.food.name }}" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=84&q=80'">{% endif %}
+        </div>
+        <div><div class="si-name">{{ item.food.name }}</div><div class="si-qty">× {{ item.quantity }}</div></div>
+        <div class="si-price">₹{{ item.food.price|floatformat:0 }}</div>
+      </div>
+      {% endfor %}
+      <hr class="sdiv">
+      <div class="srow"><span>Subtotal</span><span>₹{{ total|floatformat:0 }}</span></div>
+      <div class="srow"><span>Delivery</span><span style="color:var(--green);font-weight:600">FREE</span></div>
+      {% if coupon_discount > 0 %}<div class="srow" style="color:var(--green)"><span>🎟️ Discount</span><span>-₹{{ coupon_discount|floatformat:0 }}</span></div>{% endif %}
+      <div class="srow stotal"><span>Total</span><span>₹{{ final_total|floatformat:0 }}</span></div>
+      <div class="del-badge">🚚 Estimated: 25–35 minutes</div>
+      <div class="sec-note">🔒 &nbsp;Secure & encrypted checkout</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function selPay(el){document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');document.getElementById('payInput').value=el.dataset.val}
+function fillAddr(card){document.querySelectorAll('.saved-addr').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');document.getElementById('nameInput').value=card.dataset.name;document.getElementById('phoneInput').value=card.dataset.phone;document.getElementById('addressInput').value=card.dataset.address;document.getElementById('phoneInput').classList.add('valid')}
+document.getElementById('phoneInput').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);this.classList.toggle('valid',this.value.length===10)});
+document.getElementById('coForm').addEventListener('submit',function(){const btn=document.getElementById('placeBtn');btn.disabled=true;btn.textContent='⏳ Placing your order...'});
+const els=document.querySelectorAll('.sr');const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.07});els.forEach(el=>io.observe(el));window.addEventListener('load',()=>{els.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('in')})});
+</script>
+{% endblock %}

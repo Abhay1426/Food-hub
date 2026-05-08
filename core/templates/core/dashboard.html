@@ -1,0 +1,506 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root {
+  --orange:#FF5722; --orange2:#FF7043; --dark:#111;
+  --cream:#FFFBF7; --gray:#6b7280; --border:#e5e7eb;
+  --green:#16a34a; --blue:#2563eb; --red:#dc2626; --yellow:#d97706;
+}
+* { box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:#f1f5f9; }
+
+/* ── HEADER ── */
+.dash-header {
+  background:linear-gradient(135deg,var(--dark) 0%,#1a0800 100%);
+  padding:32px 5vw; display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:16px;
+}
+.dash-header h1 { font-family:'Playfair Display',serif; font-size:1.8rem; color:#fff; margin:0; }
+.dash-header h1 span { color:var(--orange); }
+.dash-sub { color:rgba(255,255,255,.5); font-size:.84rem; margin-top:4px; }
+.btn-django-admin {
+  background:rgba(255,255,255,.1); color:#fff;
+  padding:10px 20px; border-radius:10px; text-decoration:none;
+  font-size:.86rem; font-weight:600; border:1px solid rgba(255,255,255,.2);
+  transition:all .2s; display:flex; align-items:center; gap:7px;
+}
+.btn-django-admin:hover { background:var(--orange); border-color:var(--orange); color:#fff; text-decoration:none; }
+
+/* ── TABS ── */
+.dash-tabs {
+  background:#fff; border-bottom:1px solid var(--border);
+  padding:0 5vw; display:flex; gap:0; overflow-x:auto;
+}
+.dash-tab {
+  padding:14px 22px; font-size:.88rem; font-weight:600;
+  color:var(--gray); cursor:pointer; border-bottom:2.5px solid transparent;
+  white-space:nowrap; transition:all .2s; background:none; border-top:none;
+  border-left:none; border-right:none; font-family:'DM Sans',sans-serif;
+}
+.dash-tab:hover { color:var(--orange); }
+.dash-tab.active { color:var(--orange); border-bottom-color:var(--orange); }
+
+/* ── TAB PANELS ── */
+.tab-panel { display:none; padding:28px 5vw 60px; }
+.tab-panel.active { display:block; }
+
+/* ── STAT CARDS ── */
+.stat-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px; margin-bottom:28px;
+}
+.stat-card {
+  background:#fff; border-radius:16px; padding:22px 24px;
+  box-shadow:0 1px 10px rgba(0,0,0,.06); border-left:4px solid var(--orange);
+  transition:transform .25s, box-shadow .25s;
+}
+.stat-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,.1); }
+.stat-card.green  { border-color:var(--green); }
+.stat-card.blue   { border-color:var(--blue); }
+.stat-card.yellow { border-color:var(--yellow); }
+.stat-card.red    { border-color:var(--red); }
+.stat-label { font-size:.76rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.stat-num { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color:var(--dark); line-height:1; }
+.stat-sub { font-size:.78rem; color:var(--gray); margin-top:5px; }
+
+/* ── CHARTS ROW ── */
+.charts-row { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:24px; }
+@media(max-width:860px) { .charts-row { grid-template-columns:1fr; } }
+
+.chart-card {
+  background:#fff; border-radius:16px; padding:22px;
+  box-shadow:0 1px 10px rgba(0,0,0,.06);
+}
+.chart-title { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--dark); margin-bottom:16px; }
+
+/* ── TOP FOODS ── */
+.top-food-row {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 0; border-bottom:1px solid #f5f5f5;
+}
+.top-food-row:last-child { border-bottom:none; }
+.top-food-rank {
+  width:28px; height:28px; border-radius:50%;
+  background:var(--orange); color:#fff; font-size:.76rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.top-food-rank.r1 { background:#f59e0b; }
+.top-food-rank.r2 { background:#9ca3af; }
+.top-food-rank.r3 { background:#cd7c32; }
+.top-food-name { flex:1; font-size:.88rem; font-weight:600; color:var(--dark); }
+.top-food-qty { font-size:.82rem; color:var(--gray); font-weight:500; }
+.top-food-bar { height:4px; border-radius:99px; background:var(--orange); margin-top:4px; transition:width .8s; }
+
+/* ── ORDERS TABLE ── */
+.orders-table-wrap { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 1px 10px rgba(0,0,0,.06); }
+.orders-filter-bar {
+  padding:16px 20px; border-bottom:1px solid var(--border);
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+.filter-chip {
+  padding:6px 14px; border-radius:99px; font-size:.78rem; font-weight:600;
+  border:1.5px solid var(--border); background:#f9fafb; color:var(--gray);
+  text-decoration:none; transition:all .2s;
+}
+.filter-chip:hover, .filter-chip.active { background:var(--orange); border-color:var(--orange); color:#fff; text-decoration:none; }
+.filter-chip.green.active  { background:var(--green); border-color:var(--green); }
+.filter-chip.yellow.active { background:var(--yellow); border-color:var(--yellow); }
+.filter-chip.red.active    { background:var(--red); border-color:var(--red); }
+.filter-chip.blue.active   { background:var(--blue); border-color:var(--blue); }
+
+table.orders-tbl { width:100%; border-collapse:collapse; }
+.orders-tbl th { padding:12px 16px; background:#f8fafc; font-size:.74rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.05em; text-align:left; border-bottom:1px solid var(--border); }
+.orders-tbl td { padding:13px 16px; border-bottom:1px solid #f5f5f5; font-size:.86rem; color:var(--dark); vertical-align:middle; }
+.orders-tbl tr:last-child td { border-bottom:none; }
+.orders-tbl tr:hover td { background:#fafafa; }
+
+.status-sel {
+  padding:5px 10px; border-radius:8px; border:1.5px solid var(--border);
+  font-size:.78rem; font-weight:600; cursor:pointer; outline:none;
+  font-family:'DM Sans',sans-serif; background:#fff; transition:border .2s;
+}
+.status-sel:focus { border-color:var(--orange); }
+
+.badge-status {
+  padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:700;
+  display:inline-block;
+}
+.badge-status.Pending      { background:#f3f4f6; color:#6b7280; }
+.badge-status.Preparing    { background:#fef3c7; color:#d97706; }
+.badge-status.Out-for-Delivery { background:#dbeafe; color:#2563eb; }
+.badge-status.Delivered    { background:#dcfce7; color:#16a34a; }
+.badge-status.Cancelled    { background:#fee2e2; color:#dc2626; }
+
+/* saved indicator */
+.saved-flash { color:var(--green); font-size:.75rem; font-weight:600; display:none; }
+
+/* today highlight */
+.today-banner {
+  background:linear-gradient(135deg,var(--orange),#e64a19);
+  border-radius:16px; padding:20px 24px;
+  display:flex; justify-content:space-around; flex-wrap:wrap; gap:12px;
+  margin-bottom:24px;
+}
+.today-item { text-align:center; color:#fff; }
+.today-n { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; line-height:1; }
+.today-l { font-size:.74rem; opacity:.8; letter-spacing:.04em; margin-top:3px; }
+
+.empty-msg { text-align:center; padding:48px; color:var(--gray); font-size:.9rem; }
+</style>
+
+
+<!-- HEADER -->
+<div class="dash-header">
+  <div>
+    <h1>Admin <span>Dashboard</span></h1>
+    <div class="dash-sub">Welcome back! Here's what's happening today.</div>
+  </div>
+  <a href="/admin/" class="btn-django-admin">⚙️ Django Admin</a>
+</div>
+
+
+<!-- TABS -->
+<div class="dash-tabs">
+  <button class="dash-tab active" onclick="switchTab('overview',this)">📊 Overview</button>
+  <button class="dash-tab" onclick="switchTab('orders',this)">📦 Manage Orders</button>
+  <button class="dash-tab" onclick="switchTab('menu',this)">🍽️ Menu Items</button>
+</div>
+
+
+<!-- ══ TAB: OVERVIEW ══ -->
+<div class="tab-panel active" id="tab-overview">
+
+  <!-- Today's banner -->
+  <div class="today-banner">
+    <div class="today-item"><div class="today-n">{{ today_orders }}</div><div class="today-l">Today's Orders</div></div>
+    <div class="today-item"><div class="today-n">₹{{ today_revenue|floatformat:0 }}</div><div class="today-l">Today's Revenue</div></div>
+    <div class="today-item"><div class="today-n">{{ preparing_orders }}</div><div class="today-l">Being Prepared</div></div>
+    <div class="today-item"><div class="today-n">{{ pending_orders }}</div><div class="today-l">Pending</div></div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">💰 Total Revenue</div>
+      <div class="stat-num">₹{{ total_revenue|floatformat:0 }}</div>
+      <div class="stat-sub">All time</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">✅ Delivered</div>
+      <div class="stat-num">{{ delivered_orders }}</div>
+      <div class="stat-sub">Successfully delivered</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">👥 Customers</div>
+      <div class="stat-num">{{ total_customers }}</div>
+      <div class="stat-sub">Registered users</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">🍽️ Menu Items</div>
+      <div class="stat-num">{{ total_foods }}</div>
+      <div class="stat-sub">Active dishes</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">❌ Cancelled</div>
+      <div class="stat-num">{{ cancelled_orders }}</div>
+      <div class="stat-sub">Total cancellations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">📦 Total Orders</div>
+      <div class="stat-num">{{ total_orders }}</div>
+      <div class="stat-sub">All time</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+
+    <!-- Revenue Chart -->
+    <div class="chart-card">
+      <div class="chart-title">📈 Revenue — Last 14 Days</div>
+      <canvas id="revenueChart" height="120"></canvas>
+    </div>
+
+    <!-- Top Foods -->
+    <div class="chart-card">
+      <div class="chart-title">🏆 Top Selling Dishes</div>
+      {% if top_foods %}
+        {% for food in top_foods %}
+        <div class="top-food-row">
+          <div class="top-food-rank {% if forloop.counter == 1 %}r1{% elif forloop.counter == 2 %}r2{% elif forloop.counter == 3 %}r3{% endif %}">
+            {{ forloop.counter }}
+          </div>
+          <div>
+            <div class="top-food-name">{{ food.food__name }}</div>
+            <div class="top-food-bar" style="width:{{ food.total_qty|add:'0' }}0px;max-width:120px;"></div>
+          </div>
+          <div class="top-food-qty">{{ food.total_qty }} sold</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-msg">No orders yet</div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Orders Chart -->
+  <div class="chart-card" style="margin-bottom:24px;">
+    <div class="chart-title">📦 Orders — Last 14 Days</div>
+    <canvas id="ordersChart" height="80"></canvas>
+  </div>
+
+  <!-- Recent Orders -->
+  <div class="orders-table-wrap">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <span style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--dark);">🕐 Recent Orders</span>
+    </div>
+    {% if recent_orders %}
+    <table class="orders-tbl">
+      <thead>
+        <tr>
+          <th>Order</th><th>Customer</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in recent_orders %}
+        <tr>
+          <td><strong>#{{ order.id }}</strong></td>
+          <td>{{ order.user.username }}</td>
+          <td>₹{{ order.total_amount|floatformat:0 }}</td>
+          <td>{{ order.created_at|date:"d M, h:i A" }}</td>
+          <td><span class="badge-status {{ order.status|cut:' ' }}">{{ order.status }}</span></td>
+          <td>
+            <form method="POST" action="{% url 'update_order_status' order.id %}" style="display:inline">
+              {% csrf_token %}
+              <select name="status" class="status-sel" onchange="this.form.submit()">
+                <option value="Pending"          {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Preparing"        {% if order.status == 'Preparing' %}selected{% endif %}>Preparing</option>
+                <option value="Out for Delivery" {% if order.status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                <option value="Delivered"        {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                <option value="Cancelled"        {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+              </select>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-msg">No orders yet 🍽️</div>
+    {% endif %}
+  </div>
+
+</div>
+
+
+<!-- ══ TAB: MANAGE ORDERS ══ -->
+<div class="tab-panel" id="tab-orders">
+
+  <div class="orders-table-wrap">
+    <div class="orders-filter-bar">
+      <span style="font-size:.82rem;font-weight:600;color:var(--gray);">Filter:</span>
+      <a href="?status=" class="filter-chip {% if not status_filter %}active{% endif %}" onclick="switchTab('orders',document.querySelectorAll('.dash-tab')[1])">All</a>
+      <a href="?status=Pending" class="filter-chip {% if status_filter == 'Pending' %}active{% endif %}">⏳ Pending</a>
+      <a href="?status=Preparing" class="filter-chip yellow {% if status_filter == 'Preparing' %}active{% endif %}">🔥 Preparing</a>
+      <a href="?status=Out for Delivery" class="filter-chip blue {% if status_filter == 'Out for Delivery' %}active{% endif %}">🛵 On the way</a>
+      <a href="?status=Delivered" class="filter-chip green {% if status_filter == 'Delivered' %}active{% endif %}">✅ Delivered</a>
+      <a href="?status=Cancelled" class="filter-chip red {% if status_filter == 'Cancelled' %}active{% endif %}">❌ Cancelled</a>
+    </div>
+
+    {% if all_orders %}
+    <table class="orders-tbl">
+      <thead>
+        <tr>
+          <th>#ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Phone</th><th>Date</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in all_orders %}
+        <tr id="row-{{ order.id }}">
+          <td><strong>#{{ order.id }}</strong></td>
+          <td>
+            <div style="font-weight:600;">{{ order.user.username }}</div>
+            <div style="font-size:.76rem;color:var(--gray);">{{ order.full_name }}</div>
+          </td>
+          <td>
+            <div style="font-size:.8rem;color:var(--gray);">
+              {% for item in order.items.all|slice:":2" %}{{ item.food.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+              {% if order.items.count > 2 %} +{{ order.items.count|add:"-2" }} more{% endif %}
+            </div>
+          </td>
+          <td><strong>₹{{ order.total_amount|floatformat:0 }}</strong></td>
+          <td style="font-size:.82rem;">{{ order.phone|default:"—" }}</td>
+          <td style="font-size:.8rem;color:var(--gray);">{{ order.created_at|date:"d M Y" }}</td>
+          <td>
+            <select class="status-sel" onchange="updateStatus({{ order.id }}, this.value, this)">
+              <option value="Pending"          {% if order.status == 'Pending' %}selected{% endif %}>⏳ Pending</option>
+              <option value="Preparing"        {% if order.status == 'Preparing' %}selected{% endif %}>🔥 Preparing</option>
+              <option value="Out for Delivery" {% if order.status == 'Out for Delivery' %}selected{% endif %}>🛵 On the Way</option>
+              <option value="Delivered"        {% if order.status == 'Delivered' %}selected{% endif %}>✅ Delivered</option>
+              <option value="Cancelled"        {% if order.status == 'Cancelled' %}selected{% endif %}>❌ Cancelled</option>
+            </select>
+            <span class="saved-flash" id="flash-{{ order.id }}">✓ Saved!</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-msg">No orders found for this filter.</div>
+    {% endif %}
+  </div>
+
+</div>
+
+
+<!-- ══ TAB: MENU ITEMS ══ -->
+<div class="tab-panel" id="tab-menu">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+    <span style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--dark);">🍽️ All Menu Items</span>
+    <a href="/admin/core/fooditem/add/" target="_blank"
+       style="background:var(--orange);color:#fff;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.88rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(255,87,34,.3);"
+       onmouseover="this.style.background='#FF7043'" onmouseout="this.style.background='var(--orange)'">
+      ＋ Add New Item
+    </a>
+  </div>
+
+  <div class="orders-table-wrap">
+    <table class="orders-tbl">
+      <thead>
+        <tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Reviews</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for food in foods_all %}
+        <tr>
+          <td>
+            {% if food.image %}
+            <img src="{{ food.image.url }}" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+            {% else %}
+            <div style="width:44px;height:44px;border-radius:10px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🍽️</div>
+            {% endif %}
+          </td>
+          <td><strong>{{ food.name }}</strong><div style="font-size:.76rem;color:var(--gray);">{{ food.description|truncatechars:40 }}</div></td>
+          <td><span style="background:#fff8f5;color:var(--orange);padding:3px 10px;border-radius:99px;font-size:.74rem;font-weight:700;">{{ food.category.name }}</span></td>
+          <td><strong>₹{{ food.price }}</strong></td>
+          <td>⭐ {{ food.avg_rating }} ({{ food.review_count }})</td>
+          <td>
+            <a href="/admin/core/fooditem/{{ food.id }}/change/" target="_blank"
+               style="background:var(--dark);color:#fff;padding:6px 14px;border-radius:99px;font-size:.76rem;font-weight:600;text-decoration:none;margin-right:6px;transition:background .2s;"
+               onmouseover="this.style.background='var(--orange)'" onmouseout="this.style.background='var(--dark)'">
+              ✏️ Edit
+            </a>
+            <a href="/admin/core/fooditem/{{ food.id }}/delete/" target="_blank"
+               style="background:#fee2e2;color:#dc2626;padding:6px 14px;border-radius:99px;font-size:.76rem;font-weight:600;text-decoration:none;transition:background .2s;"
+               onmouseover="this.style.background='#dc2626';this.style.color='#fff'" onmouseout="this.style.background='#fee2e2';this.style.color='#dc2626'">
+              🗑 Delete
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="empty-msg">No food items yet. <a href="/admin/core/fooditem/add/" style="color:var(--orange);">Add one!</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+  // ── TAB SWITCHING ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  // ── REVENUE CHART ──
+  const labels  = {{ chart_labels|safe }};
+  const revenue = {{ chart_revenue|safe }};
+  const orders  = {{ chart_orders|safe }};
+
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: revenue,
+        borderColor: '#FF5722',
+        backgroundColor: 'rgba(255,87,34,.08)',
+        borderWidth: 2.5,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#FF5722',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { callback: v => '₹' + v } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('ordersChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Orders',
+        data: orders,
+        backgroundColor: 'rgba(255,87,34,.7)',
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { stepSize: 1 } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // ── AJAX STATUS UPDATE ──
+  function updateStatus(orderId, status, sel) {
+    const flash = document.getElementById('flash-' + orderId);
+    const fd = new FormData();
+    fd.append('status', status);
+    fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch('/admin-update-order/' + orderId + '/', {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: fd
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'success') {
+        flash.style.display = 'inline';
+        setTimeout(() => flash.style.display = 'none', 2000);
+      }
+    });
+  }
+
+  // Keep manage orders tab active if filter applied
+  {% if status_filter %}
+  switchTab('orders', document.querySelectorAll('.dash-tab')[1]);
+  {% endif %}
+</script>
+
+{% endblock %}

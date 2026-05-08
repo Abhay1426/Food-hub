@@ -1,0 +1,115 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root { --orange:#FF5722; --dark:#111; --green:#16a34a; --gray:#6b7280; }
+* { box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:#FFFBF7; }
+
+.success-wrap {
+  min-height:80vh; display:flex; align-items:center;
+  justify-content:center; padding:40px 5vw; text-align:center;
+}
+.success-card {
+  background:#fff; border-radius:24px; padding:48px 40px;
+  box-shadow:0 4px 32px rgba(0,0,0,.08); max-width:480px; width:100%;
+}
+.success-anim {
+  width:90px; height:90px; border-radius:50%;
+  background:#dcfce7; border:3px solid var(--green);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.4rem; margin:0 auto 20px;
+  animation:popIn .6s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes popIn { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
+
+h2 {
+  font-family:'Playfair Display',serif;
+  font-size:2rem; color:var(--dark); margin-bottom:8px;
+}
+.sub { color:var(--gray); font-size:.92rem; margin-bottom:28px; line-height:1.6; }
+
+.order-info {
+  background:#f9fafb; border-radius:14px; padding:18px;
+  margin-bottom:24px; text-align:left;
+}
+.oi-row {
+  display:flex; justify-content:space-between;
+  padding:6px 0; font-size:.88rem; color:var(--gray);
+  border-bottom:1px solid #f0f0f0;
+}
+.oi-row:last-child { border-bottom:none; }
+.oi-row strong { color:var(--dark); }
+
+/* confetti dots */
+.confetti { position:relative; overflow:hidden; }
+.dot {
+  position:absolute; width:8px; height:8px; border-radius:50%;
+  animation:fall 1.5s ease-in forwards;
+  opacity:0;
+}
+@keyframes fall {
+  0%  { transform:translateY(-20px) rotate(0); opacity:1; }
+  100%{ transform:translateY(120px) rotate(360deg); opacity:0; }
+}
+
+.btn-track {
+  display:inline-flex; align-items:center; gap:7px;
+  background:var(--orange); color:#fff;
+  padding:14px 32px; border-radius:99px;
+  font-weight:700; font-size:.96rem; text-decoration:none;
+  box-shadow:0 6px 20px rgba(255,87,34,.35); transition:all .22s;
+  margin-right:10px; margin-bottom:10px;
+}
+.btn-track:hover { background:#FF7043; color:#fff; text-decoration:none; transform:translateY(-2px); }
+.btn-menu {
+  display:inline-flex; align-items:center; gap:7px;
+  background:#f9fafb; color:var(--gray);
+  padding:14px 32px; border-radius:99px;
+  font-weight:600; font-size:.96rem; text-decoration:none;
+  border:1.5px solid #e5e7eb; transition:all .22s; margin-bottom:10px;
+}
+.btn-menu:hover { color:var(--dark); border-color:var(--dark); text-decoration:none; }
+</style>
+
+<div class="success-wrap">
+  <div class="success-card confetti" id="card">
+    <div class="success-anim">✅</div>
+    <h2>Order Placed! 🎉</h2>
+    <p class="sub">
+      Your order has been received and the kitchen is getting started!<br>
+      Estimated delivery: <strong>25–35 minutes</strong>
+    </p>
+
+    <div class="order-info">
+      <div class="oi-row"><span>Order ID</span><strong>#{{ order.id }}</strong></div>
+      <div class="oi-row"><span>Total</span><strong style="color:var(--orange);">₹{{ order.total_amount|floatformat:0 }}</strong></div>
+      <div class="oi-row"><span>Status</span><strong style="color:#d97706;">🔥 {{ order.status }}</strong></div>
+      <div class="oi-row"><span>Delivery to</span><strong>{{ order.address|truncatechars:40 }}</strong></div>
+    </div>
+
+    <a href="{% url 'order_detail' order.id %}" class="btn-track">📦 Track Order</a>
+    <a href="{% url 'food_list' %}" class="btn-menu">🍽️ Order More</a>
+  </div>
+</div>
+
+<script>
+// Confetti effect
+const colors = ['#FF5722','#FFC107','#4CAF50','#2196F3','#E91E63'];
+const card = document.getElementById('card');
+for (let i = 0; i < 20; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot';
+  dot.style.cssText = `
+    left:${Math.random()*100}%;
+    top:${Math.random()*30}%;
+    background:${colors[Math.floor(Math.random()*colors.length)]};
+    animation-delay:${Math.random()*1}s;
+    animation-duration:${1.2+Math.random()*0.8}s;
+    width:${6+Math.random()*6}px;
+    height:${6+Math.random()*6}px;
+  `;
+  card.appendChild(dot);
+}
+</script>
+{% endblock %}

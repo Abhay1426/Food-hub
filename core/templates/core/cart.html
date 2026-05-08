@@ -1,0 +1,150 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#FFF8F2!important}
+.content-wrap{background:#FFF8F2!important;padding:0!important}
+:root{--or:#FF5722;--or2:#FF7043;--dk:#1a1a1a;--cream:#FFF8F2;--gray:#6b7280;--border:#e5e7eb;--green:#16a34a}
+.pg-header{background:linear-gradient(135deg,#1a1a1a,#2d1200);padding:40px 6vw 34px;position:relative;overflow:hidden}
+.pg-header::after{content:'🛒';position:absolute;right:6vw;top:50%;transform:translateY(-50%);font-size:6rem;opacity:.08}
+.pg-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.6rem);color:#fff;margin-bottom:4px}
+.pg-header h1 span{color:var(--or)}
+.pg-header p{color:rgba(255,255,255,.5);font-size:.9rem;margin:0}
+.cart-layout{display:grid;grid-template-columns:1fr 360px;gap:24px;padding:28px 5vw 60px;align-items:start}
+@media(max-width:860px){.cart-layout{grid-template-columns:1fr}}
+.cart-col-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--dk);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.cart-badge-count{background:var(--or);color:#fff;font-size:.7rem;font-weight:700;padding:2px 9px;border-radius:99px;font-family:'DM Sans',sans-serif}
+.cart-item{background:#fff;border-radius:18px;padding:17px 20px;margin-bottom:13px;display:flex;align-items:center;gap:15px;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:all .25s;animation:slideIn .35s ease both;border:1.5px solid transparent}
+.cart-item:hover{box-shadow:0 6px 22px rgba(0,0,0,.1);border-color:rgba(255,87,34,.1);transform:translateX(3px)}
+@keyframes slideIn{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+.ci-thumb{width:76px;height:76px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#FFF3E0,#FFE0B2);flex-shrink:0}
+.ci-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.ci-info{flex:1;min-width:0}
+.ci-cat{font-size:.68rem;font-weight:700;color:var(--or);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ci-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--dk);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-unit{font-size:.78rem;color:var(--gray)}
+.qty-ctrl{display:flex;align-items:center;gap:0;background:#fafafa;border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.qty-btn{width:34px;height:34px;background:none;border:none;color:var(--dk);font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.qty-btn:hover{background:var(--or);color:#fff;text-decoration:none}
+.qty-num{min-width:32px;text-align:center;font-weight:700;font-size:.92rem;color:var(--dk)}
+.ci-right{display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex-shrink:0}
+.ci-total{font-size:1.12rem;font-weight:700;color:var(--dk)}
+.ci-total sup{font-size:.65rem;color:var(--gray);vertical-align:super}
+.btn-remove{background:#fff0f0;border:1px solid #fecaca;color:#dc2626;padding:6px 13px;border-radius:99px;font-size:.75rem;font-weight:600;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:4px}
+.btn-remove:hover{background:#dc2626;color:#fff;border-color:#dc2626;text-decoration:none}
+.summary-card{background:#fff;border-radius:20px;padding:26px 24px;box-shadow:0 4px 20px rgba(0,0,0,.08);position:sticky;top:88px}
+.sum-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--dk);margin-bottom:18px;padding-bottom:14px;border-bottom:1.5px solid #f0f0f0}
+.sum-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f7f7f7;font-size:.86rem}
+.sum-item:last-of-type{border-bottom:none}
+.sum-item .sn{color:var(--gray)}
+.sum-item .sv{color:var(--dk);font-weight:500}
+.coupon-wrap{margin:14px 0;display:flex;gap:7px}
+.coupon-wrap input{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:.86rem;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s;background:#fafafa}
+.coupon-wrap input:focus{border-color:var(--or);background:#fff}
+.coupon-wrap button{background:var(--dk);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
+.coupon-wrap button:hover{background:var(--or)}
+#couponMsg{font-size:.78rem;margin-top:5px;padding:7px 12px;border-radius:8px;font-weight:500;display:none}
+.sum-divider{border:none;border-top:1.5px solid #f0f0f0;margin:12px 0}
+.sum-row{display:flex;justify-content:space-between;font-size:.86rem;color:var(--gray);padding:4px 0}
+.sum-row.total{font-size:1.1rem;font-weight:700;color:var(--dk);border-top:1.5px solid #f0f0f0;padding-top:13px;margin-top:6px}
+.sum-row.total span:last-child{color:var(--or);font-size:1.2rem}
+.delivery-badge{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin:14px 0;font-size:.82rem;color:var(--green);font-weight:500;display:flex;align-items:center;gap:7px}
+.btn-checkout{display:block;width:100%;background:var(--or);color:#fff;padding:15px;border-radius:13px;font-weight:700;font-size:.98rem;text-align:center;text-decoration:none;transition:all .25s;box-shadow:0 5px 18px rgba(255,87,34,.3);margin-bottom:10px}
+.btn-checkout:hover{background:var(--or2);color:#fff;text-decoration:none;transform:translateY(-2px);box-shadow:0 9px 26px rgba(255,87,34,.4)}
+.btn-continue{display:block;width:100%;text-align:center;padding:12px;border-radius:13px;border:1.5px solid var(--border);color:var(--gray);font-size:.88rem;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-continue:hover{border-color:var(--dk);color:var(--dk);text-decoration:none}
+.empty-cart{text-align:center;padding:72px 20px;background:#fff;border-radius:22px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+.empty-cart .ei{font-size:4.5rem;margin-bottom:16px}
+.empty-cart h3{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--dk);margin-bottom:8px}
+.empty-cart p{color:var(--gray);font-size:.9rem;margin-bottom:24px}
+.sr{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.sr.in{opacity:1;transform:translateY(0)}
+</style>
+
+<div class="pg-header">
+  <h1>Your <span>Cart</span></h1>
+  <p>{% if cart_items %}{{ cart_count }} item{{ cart_count|pluralize }} ready to order{% else %}Your cart is empty{% endif %}</p>
+</div>
+
+{% if cart_items %}
+<div class="cart-layout">
+  <div>
+    <div class="cart-col-title">Order Items <span class="cart-badge-count">{{ cart_count }}</span></div>
+    {% for item in cart_items %}
+    <div class="cart-item" style="animation-delay:{{ forloop.counter0 }}70ms">
+      <div class="ci-thumb">
+        {% if item.food.image %}<img src="{{ item.food.image.url }}" alt="{{ item.food.name }}">
+        {% else %}<img src="https://source.unsplash.com/152x152/?{{ item.food.name|urlencode }},food" alt="{{ item.food.name }}" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=152&q=80'">{% endif %}
+      </div>
+      <div class="ci-info">
+        <div class="ci-cat">{{ item.food.category.name }}</div>
+        <div class="ci-name">{{ item.food.name }}</div>
+        <div class="ci-unit">₹{{ item.food.price }} per item</div>
+      </div>
+      <div class="qty-ctrl">
+        <a href="{% url 'decrease_quantity' item.id %}" class="qty-btn">−</a>
+        <span class="qty-num">{{ item.quantity }}</span>
+        <a href="{% url 'increase_quantity' item.id %}" class="qty-btn">+</a>
+      </div>
+      <div class="ci-right">
+        <div class="ci-total"><sup>₹</sup>{{ item.food.price|floatformat:0 }}</div>
+        <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">🗑 Remove</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div>
+    <div class="summary-card sr">
+      <div class="sum-title">🧾 Order Summary</div>
+      {% for item in cart_items %}
+      <div class="sum-item"><span class="sn">{{ item.food.name }} ×{{ item.quantity }}</span><span class="sv">₹{{ item.food.price|floatformat:0 }}</span></div>
+      {% endfor %}
+      <hr class="sum-divider">
+      <!-- COUPON -->
+      <div class="coupon-wrap">
+        <input type="text" id="couponInput" placeholder="Enter coupon code" value="{% if request.session.coupon_code %}{{ request.session.coupon_code }}{% endif %}">
+        <button type="button" onclick="applyCoupon()">Apply</button>
+      </div>
+      <div id="couponMsg"></div>
+      {% if request.session.coupon_code %}
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:7px 12px;margin-bottom:8px">
+        <span style="font-size:.8rem;color:var(--green);font-weight:600">✅ "{{ request.session.coupon_code }}" applied!</span>
+        <button onclick="removeCoupon()" style="background:none;border:none;color:#dc2626;font-size:.76rem;cursor:pointer;font-weight:600">✕</button>
+      </div>
+      {% endif %}
+      <div class="sum-row"><span>Subtotal</span><span>₹{{ total_price|floatformat:0 }}</span></div>
+      <div class="sum-row"><span>Delivery</span><span style="color:var(--green);font-weight:600">FREE</span></div>
+      {% if request.session.coupon_discount %}<div class="sum-row" style="color:var(--green)"><span>🎟️ Discount</span><span>-₹{{ request.session.coupon_discount|floatformat:0 }}</span></div>{% endif %}
+      <div class="sum-row total"><span>Total</span><span>₹{{ total_price|floatformat:0 }}</span></div>
+      <div class="delivery-badge">🚚 Free delivery on this order!</div>
+      <a href="{% url 'checkout' %}" class="btn-checkout">Proceed to Checkout →</a>
+      <a href="{% url 'food_list' %}" class="btn-continue">← Continue Shopping</a>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div style="padding:40px 5vw 60px">
+  <div class="empty-cart sr">
+    <div class="ei">🛒</div>
+    <h3>Your cart is empty!</h3>
+    <p>Looks like you haven't added anything yet. Explore our menu!</p>
+    <a href="{% url 'food_list' %}" style="background:var(--or);color:#fff;padding:14px 32px;border-radius:13px;font-weight:700;text-decoration:none;box-shadow:0 5px 18px rgba(255,87,34,.3);display:inline-block">🍽️ Browse Menu</a>
+  </div>
+</div>
+{% endif %}
+
+<script>
+(function(){
+  const csrf='{{ csrf_token }}';const cartTotal={{ total_price }};
+  function applyCoupon(){const code=document.getElementById('couponInput').value.trim();const msg=document.getElementById('couponMsg');if(!code)return;fetch('{% url "apply_coupon" %}',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':csrf},body:`coupon_code=${code}&total=${cartTotal}`}).then(r=>r.json()).then(d=>{msg.style.display='block';if(d.status==='success'){msg.style.background='#f0fdf4';msg.style.color='#16a34a';msg.textContent=d.message;setTimeout(()=>location.reload(),1000)}else{msg.style.background='#fff0f0';msg.style.color='#dc2626';msg.textContent=d.message}})}
+  function removeCoupon(){fetch('{% url "remove_coupon" %}',{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(()=>location.reload())}
+  window.applyCoupon=applyCoupon;window.removeCoupon=removeCoupon;
+  document.getElementById('couponInput')?.addEventListener('keypress',e=>{if(e.key==='Enter')applyCoupon()});
+  const els=document.querySelectorAll('.sr');const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.08});els.forEach(el=>io.observe(el));window.addEventListener('load',()=>{els.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('in')})});
+})();
+</script>
+{% endblock %}

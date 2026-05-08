@@ -1,0 +1,170 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#FFF8F2!important}
+.content-wrap{background:#FFF8F2!important;padding:0!important}
+:root{--or:#FF5722;--or2:#FF7043;--dk:#1a1a1a;--cream:#FFF8F2;--gray:#6b7280;--border:#e5e7eb;--green:#16a34a}
+.auth-page{min-height:calc(100vh - 68px);display:grid;grid-template-columns:1fr 1fr}
+.auth-left{position:relative;overflow:hidden;background:#1a1a1a;display:flex;flex-direction:column;justify-content:flex-end;padding:48px;min-height:calc(100vh - 68px)}
+.al-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80');background-size:cover;background-position:center;opacity:.5;transition:transform 6s ease}
+.auth-left:hover .al-bg{transform:scale(1.04)}
+.al-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.8) 100%)}
+.al-brand{position:absolute;top:40px;left:48px;z-index:2;font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:10px}
+.al-brand:hover{text-decoration:none;color:#fff}
+.al-brand-ic{width:36px;height:36px;background:var(--or);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.al-brand span{color:var(--or)}
+.al-content{position:relative;z-index:2}
+.al-quote{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,2.5vw,2.4rem);color:#fff;line-height:1.25;margin-bottom:14px}
+.al-quote em{font-style:italic;color:var(--or)}
+.al-sub{color:rgba(255,255,255,.6);font-size:.88rem;line-height:1.65;margin-bottom:24px}
+.al-badges{display:flex;gap:10px;flex-wrap:wrap}
+.al-badge{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:99px;color:#fff;font-size:.8rem;font-weight:500}
+.auth-right{background:var(--cream);display:flex;align-items:center;justify-content:center;padding:40px;min-height:calc(100vh - 68px);overflow-y:auto}
+.auth-form-wrap{width:100%;max-width:420px}
+.auth-title{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--dk);margin-bottom:5px}
+.auth-title span{color:var(--or)}
+.auth-sub{color:var(--gray);font-size:.88rem;margin-bottom:20px}
+/* progress */
+.prog-steps{display:flex;gap:7px;margin-bottom:22px}
+.ps{flex:1;height:4px;border-radius:99px;background:var(--border);transition:background .35s}
+.ps.active{background:var(--or)}
+.ps.done{background:var(--green)}
+.ig{margin-bottom:14px}
+.ig label{display:block;font-size:.78rem;font-weight:600;color:var(--dk);margin-bottom:5px}
+.ig input{width:100%;padding:12px 44px 12px 16px;border-radius:12px;border:1.5px solid var(--border);font-size:.91rem;font-family:'DM Sans',sans-serif;background:#fafafa;color:var(--dk);outline:none;transition:border .2s,box-shadow .2s}
+.ig input:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(255,87,34,.1);background:#fff}
+.ig input.valid{border-color:var(--green)}
+.ig input.invalid{border-color:#dc2626}
+.ig input::placeholder{color:#bbb}
+.ig-rel{position:relative}
+.ig-rel .ic{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:#bbb;font-size:.88rem;cursor:pointer}
+.ig-rel .ic:hover{color:var(--or)}
+.ig-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ferr{font-size:.74rem;color:#dc2626;margin-top:4px}
+.nfe-alert{background:#fff0f0;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;color:#dc2626;font-size:.84rem;margin-bottom:14px}
+/* strength */
+.str-bar{height:4px;border-radius:99px;background:var(--border);margin-top:7px;overflow:hidden}
+.str-fill{height:100%;border-radius:99px;width:0;transition:width .3s,background .3s}
+.str-lbl{font-size:.72rem;color:var(--gray);margin-top:3px}
+.match-hint{font-size:.74rem;margin-top:4px}
+/* terms */
+.terms-row{display:flex;align-items:flex-start;gap:9px;font-size:.82rem;color:var(--gray);margin-bottom:14px;margin-top:2px}
+.terms-row input{margin-top:2px;accent-color:var(--or)}
+.terms-row a{color:var(--or);text-decoration:none;font-weight:500}
+.terms-row a:hover{text-decoration:underline}
+.btn-auth{display:block;width:100%;background:var(--or);color:#fff;padding:14px;border-radius:12px;font-weight:700;font-size:.96rem;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s;box-shadow:0 5px 18px rgba(255,87,34,.3)}
+.btn-auth:hover{background:var(--or2);transform:translateY(-2px)}
+.auth-switch{text-align:center;font-size:.88rem;color:var(--gray);margin-top:16px}
+.auth-switch a{color:var(--or);font-weight:600;text-decoration:none}
+.auth-switch a:hover{text-decoration:underline}
+@media(max-width:760px){.auth-page{grid-template-columns:1fr}.auth-left{display:none}.auth-right{padding:32px 20px}.ig-row{grid-template-columns:1fr}}
+</style>
+
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="al-bg"></div>
+    <div class="al-overlay"></div>
+    <a href="/" class="al-brand"><div class="al-brand-ic">🍔</div>Food<span>Hub</span></a>
+    <div class="al-content">
+      <h2 class="al-quote">Join us &amp;<br><em>enjoy amazing</em><br>food every day.</h2>
+      <p class="al-sub">Create your free account in seconds and start ordering from the best local kitchen.</p>
+      <div class="al-badges">
+        <div class="al-badge">✅ Free to join</div>
+        <div class="al-badge">🎁 First order discount</div>
+        <div class="al-badge">🚀 Fast delivery</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <h2 class="auth-title">Create <span>Account</span></h2>
+      <p class="auth-sub">Fill in the details below to get started</p>
+
+      <div class="prog-steps">
+        <div class="ps active" id="ps1"></div>
+        <div class="ps" id="ps2"></div>
+        <div class="ps" id="ps3"></div>
+      </div>
+
+      {% if form.non_field_errors %}
+      <div class="nfe-alert">{% for e in form.non_field_errors %}❌ {{ e }}{% endfor %}</div>
+      {% endif %}
+
+      <form method="POST" id="regForm">
+        {% csrf_token %}
+        <div class="ig">
+          <label>Username</label>
+          <div class="ig-rel">
+            <input type="text" name="username" id="unInput" placeholder="Choose a username" value="{{ form.username.value|default:'' }}" required autocomplete="username">
+            <span class="ic">👤</span>
+          </div>
+          {% if form.username.errors %}<div class="ferr">❌ {{ form.username.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="ig">
+          <label>Email</label>
+          <div class="ig-rel">
+            <input type="email" name="email" id="emInput" placeholder="your@email.com" value="{{ form.email.value|default:'' }}" required autocomplete="email">
+            <span class="ic">✉️</span>
+          </div>
+          {% if form.email.errors %}<div class="ferr">❌ {{ form.email.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="ig">
+          <label>Phone Number</label>
+          <div class="ig-rel">
+            <input type="tel" name="phone" id="phInput" placeholder="10-digit mobile number" value="{{ form.phone.value|default:'' }}" maxlength="10" required>
+            <span class="ic">📱</span>
+          </div>
+          {% if form.phone.errors %}<div class="ferr">❌ {{ form.phone.errors.0 }}</div>
+          {% else %}<div style="font-size:.72rem;color:var(--gray);margin-top:3px">Enter 10-digit number without country code</div>{% endif %}
+        </div>
+        <div class="ig">
+          <label>Password</label>
+          <div class="ig-rel">
+            <input type="password" name="password1" id="p1" placeholder="Create a strong password" required autocomplete="new-password">
+            <span class="ic" id="tp1" onclick="toggleP('p1','tp1')">👁</span>
+          </div>
+          <div class="str-bar"><div class="str-fill" id="strFill"></div></div>
+          <div class="str-lbl" id="strLbl">Enter a password</div>
+          {% if form.password1.errors %}<div class="ferr">❌ {{ form.password1.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="ig">
+          <label>Confirm Password</label>
+          <div class="ig-rel">
+            <input type="password" name="password2" id="p2" placeholder="Repeat your password" required autocomplete="new-password">
+            <span class="ic" id="tp2" onclick="toggleP('p2','tp2')">👁</span>
+          </div>
+          <div class="match-hint" id="matchH"></div>
+          {% if form.password2.errors %}<div class="ferr">❌ {{ form.password2.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="terms-row">
+          <input type="checkbox" id="tc" required>
+          <label for="tc">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+        </div>
+        <button type="submit" class="btn-auth">Create Account 🚀</button>
+      </form>
+      <div class="auth-switch">Already have an account? <a href="{% url 'login' %}">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleP(fid,bid){const f=document.getElementById(fid);f.type=f.type==='password'?'text':'password';document.getElementById(bid).textContent=f.type==='password'?'👁':'🙈'}
+// Strength
+document.getElementById('p1').addEventListener('input',function(){
+  const v=this.value,f=document.getElementById('strFill'),l=document.getElementById('strLbl');
+  let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
+  const m=[{w:'0%',bg:'#e5e7eb',t:'Enter a password'},{w:'25%',bg:'#dc2626',t:'😟 Weak'},{w:'50%',bg:'#f59e0b',t:'😐 Fair'},{w:'75%',bg:'#2563eb',t:'🙂 Good'},{w:'100%',bg:'#16a34a',t:'💪 Strong'}];
+  f.style.width=m[s].w;f.style.background=m[s].bg;l.textContent=m[s].t;l.style.color=m[s].bg;checkMatch();
+});
+function checkMatch(){const p1=document.getElementById('p1').value,p2=document.getElementById('p2').value,h=document.getElementById('matchH');if(!p2){h.textContent='';return}if(p1===p2){h.textContent='✅ Passwords match!';h.style.color='#16a34a';document.getElementById('p2').className='valid'}else{h.textContent='❌ Passwords do not match';h.style.color='#dc2626';document.getElementById('p2').className='invalid'}}
+document.getElementById('p2').addEventListener('input',checkMatch);
+// Progress
+[{id:'unInput',ps:'ps1'},{id:'emInput',ps:'ps2'},{id:'p1',ps:'ps3'}].forEach(({id,ps},i)=>{document.getElementById(id)?.addEventListener('input',()=>{if(document.getElementById(id).value.length>0){document.getElementById(ps).className='ps done';const next=`ps${i+2}`;if(document.getElementById(next))document.getElementById(next).className='ps active'}})});
+// Phone only digits
+document.getElementById('phInput').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)});
+</script>
+{% endblock %}

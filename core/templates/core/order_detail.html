@@ -1,0 +1,351 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --orange: #FF5722; --orange2: #FF7043;
+  --dark: #111; --cream: #FFFBF7;
+  --gray: #6b7280; --border: #e5e7eb;
+  --green: #16a34a; --yellow: #d97706; --red: #dc2626;
+}
+* { box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); }
+
+.page-header {
+  background: linear-gradient(135deg, var(--dark) 0%, #1a0800 100%);
+  padding: 44px 6vw 38px;
+  position: relative; overflow: hidden;
+}
+.page-header::before {
+  content: '📦'; position: absolute; right: 6vw; top: 50%;
+  transform: translateY(-50%); font-size: 6rem; opacity: .08;
+}
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem); color: #fff; margin-bottom: 4px;
+}
+.page-header h1 span { color: var(--orange); }
+.page-header p { color: rgba(255,255,255,.5); font-size: .9rem; margin: 0; }
+
+/* layout */
+.od-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  padding: 32px 5vw 60px;
+  align-items: start;
+}
+@media (max-width: 820px) { .od-layout { grid-template-columns: 1fr; } }
+
+.od-card {
+  background: #fff; border-radius: 20px; padding: 26px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07); margin-bottom: 20px;
+}
+.od-card__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--dark);
+  margin: 0 0 18px; padding-bottom: 14px;
+  border-bottom: 1.5px solid #f0f0f0;
+}
+
+/* status badge */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: 99px;
+  font-size: .82rem; font-weight: 700;
+}
+.status-badge.pending    { background: #f3f4f6; color: #6b7280; }
+.status-badge.preparing  { background: #fef3c7; color: #d97706; }
+.status-badge.out        { background: #dbeafe; color: #2563eb; }
+.status-badge.delivered  { background: #dcfce7; color: #16a34a; }
+.status-badge.cancelled  { background: #fee2e2; color: #dc2626; }
+
+/* tracking steps */
+.track-steps {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; position: relative;
+}
+.track-steps::before {
+  content: ''; position: absolute; top: 28px; left: 28px; right: 28px;
+  height: 2px; background: var(--border); z-index: 0;
+}
+.track-step {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; position: relative; z-index: 1; flex: 1;
+}
+.track-dot {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: #f3f4f6; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; transition: all .3s;
+}
+.track-dot.done   { background: var(--green); border-color: var(--green); }
+.track-dot.active { background: var(--orange); border-color: var(--orange); box-shadow: 0 4px 12px rgba(255,87,34,.35); }
+.track-dot.cancel { background: var(--red); border-color: var(--red); }
+.track-label { font-size: .72rem; color: var(--gray); font-weight: 500; text-align: center; }
+.track-step.done   .track-label { color: var(--green); font-weight: 600; }
+.track-step.active .track-label { color: var(--orange); font-weight: 600; }
+
+/* info rows */
+.info-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid #f7f7f7;
+}
+.info-row:last-child { border-bottom: none; }
+.info-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #fff8f5; border: 1px solid #ffe0cc;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .95rem; flex-shrink: 0;
+}
+.info-label { font-size: .74rem; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.info-value { font-size: .92rem; color: var(--dark); font-weight: 500; margin-top: 2px; }
+
+/* items */
+.order-item-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid #f7f7f7;
+}
+.order-item-row:last-child { border-bottom: none; }
+.oi-thumb {
+  width: 52px; height: 52px; border-radius: 12px; overflow: hidden;
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2); flex-shrink: 0;
+}
+.oi-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.oi-name { font-weight: 600; font-size: .92rem; color: var(--dark); }
+.oi-qty  { font-size: .8rem; color: var(--gray); margin-top: 2px; }
+.oi-price { font-weight: 700; font-size: 1rem; color: var(--dark); margin-left: auto; }
+
+/* summary */
+.sum-row {
+  display: flex; justify-content: space-between;
+  font-size: .88rem; color: var(--gray); padding: 5px 0;
+}
+.sum-row.total {
+  font-size: 1.1rem; font-weight: 700; color: var(--dark);
+  border-top: 1.5px solid #f0f0f0; padding-top: 14px; margin-top: 8px;
+}
+.sum-row.total span:last-child { color: var(--orange); }
+
+/* action buttons */
+.btn-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--dark); color: #fff;
+  padding: 12px 24px; border-radius: 99px;
+  font-weight: 600; font-size: .9rem; text-decoration: none;
+  transition: all .22s;
+}
+.btn-back:hover { background: var(--orange); color: #fff; text-decoration: none; transform: translateY(-2px); }
+
+.btn-cancel {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #fff; color: var(--red);
+  padding: 12px 24px; border-radius: 99px;
+  font-weight: 600; font-size: .9rem; text-decoration: none;
+  border: 1.5px solid #fecaca; transition: all .22s;
+}
+.btn-cancel:hover { background: var(--red); color: #fff; border-color: var(--red); text-decoration: none; }
+
+.sr { opacity: 0; transform: translateY(20px); transition: opacity .5s, transform .5s; }
+.sr.in { opacity: 1; transform: translateY(0); }
+</style>
+
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Order <span>#{{ order.id }}</span></h1>
+  <p>📅 Placed on {{ order.created_at|date:"d M Y, h:i A" }}</p>
+</div>
+
+
+<div class="od-layout">
+
+  <!-- LEFT -->
+  <div>
+
+    <!-- ORDER TRACKING -->
+    <div class="od-card sr">
+      <div class="od-card__title">🚀 Order Tracking</div>
+
+      {% if order.status == "Cancelled" %}
+      <div style="text-align:center;padding:16px 0;">
+        <div style="font-size:2.5rem;margin-bottom:8px;">❌</div>
+        <div class="status-badge cancelled">Order Cancelled</div>
+        <p style="color:var(--gray);font-size:.88rem;margin-top:12px;">This order was cancelled.</p>
+      </div>
+
+      {% else %}
+      <div class="track-steps">
+
+        <!-- Placed -->
+        <div class="track-step done">
+          <div class="track-dot done">✓</div>
+          <div class="track-label">Order Placed</div>
+        </div>
+
+        <!-- Preparing -->
+        <div class="track-step {% if order.status == 'Preparing' %}active{% elif order.status == 'Out for Delivery' or order.status == 'Delivered' %}done{% endif %}">
+          <div class="track-dot {% if order.status == 'Preparing' %}active{% elif order.status == 'Out for Delivery' or order.status == 'Delivered' %}done{% endif %}">
+            {% if order.status == 'Out for Delivery' or order.status == 'Delivered' %}✓{% else %}🔥{% endif %}
+          </div>
+          <div class="track-label">Preparing</div>
+        </div>
+
+        <!-- Out for delivery -->
+        <div class="track-step {% if order.status == 'Out for Delivery' %}active{% elif order.status == 'Delivered' %}done{% endif %}">
+          <div class="track-dot {% if order.status == 'Out for Delivery' %}active{% elif order.status == 'Delivered' %}done{% endif %}">
+            {% if order.status == 'Delivered' %}✓{% else %}🛵{% endif %}
+          </div>
+          <div class="track-label">On the Way</div>
+        </div>
+
+        <!-- Delivered -->
+        <div class="track-step {% if order.status == 'Delivered' %}done{% endif %}">
+          <div class="track-dot {% if order.status == 'Delivered' %}done{% endif %}">
+            {% if order.status == 'Delivered' %}✓{% else %}🏠{% endif %}
+          </div>
+          <div class="track-label">Delivered</div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;margin-top:16px;">
+        {% if order.status == 'Preparing' %}
+          <span class="status-badge preparing">🔥 Kitchen is preparing your order</span>
+        {% elif order.status == 'Out for Delivery' %}
+          <span class="status-badge out">🛵 Out for delivery — almost there!</span>
+        {% elif order.status == 'Delivered' %}
+          <span class="status-badge delivered">✅ Delivered successfully!</span>
+        {% else %}
+          <span class="status-badge pending">⏳ Order received</span>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+
+
+    <!-- ORDER ITEMS -->
+    <div class="od-card sr" style="transition-delay:.08s">
+      <div class="od-card__title">🍽️ Items Ordered</div>
+
+      {% for item in items %}
+      <div class="order-item-row">
+        <div class="oi-thumb">
+          {% if item.food.image %}
+            <img src="{{ item.food.image.url }}" alt="{{ item.food.name }}">
+          {% else %}
+            <img src="https://source.unsplash.com/104x104/?{{ item.food.name|urlencode }},food"
+                 alt="{{ item.food.name }}"
+                 onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=104&q=80'">
+          {% endif %}
+        </div>
+        <div>
+          <div class="oi-name">{{ item.food.name }}</div>
+          <div class="oi-qty">× {{ item.quantity }} &nbsp;·&nbsp; ₹{{ item.food.price }} each</div>
+        </div>
+        <div class="oi-price">₹{{ item.food.price|floatformat:0 }}</div>
+      </div>
+      {% endfor %}
+
+      <div style="margin-top:16px;">
+        <div class="sum-row"><span>Subtotal</span><span>₹{{ total|floatformat:0 }}</span></div>
+        <div class="sum-row"><span>Delivery fee</span><span style="color:var(--green);font-weight:600;">FREE</span></div>
+        <div class="sum-row total"><span>Total</span><span>₹{{ total|floatformat:0 }}</span></div>
+      </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="{% url 'my_orders' %}" class="btn-back">← Back to Orders</a>
+      {% if order.status != 'Cancelled' and order.status != 'Delivered' %}
+      <a href="{% url 'order_tracking' order.id %}" 
+         style="display:inline-flex;align-items:center;gap:7px;background:var(--orange);color:#fff;padding:12px 24px;border-radius:99px;font-weight:600;font-size:.9rem;text-decoration:none;transition:all .22s;"
+         onmouseover="this.style.background='#FF7043'" onmouseout="this.style.background='var(--orange)'">
+        🛵 Live Track
+      </a>
+      {% endif %}
+      {% if order.status == "Pending" %}
+      <a href="{% url 'cancel_order' order.id %}" class="btn-cancel"
+         onclick="return confirm('Are you sure you want to cancel this order?')">
+        ❌ Cancel Order
+      </a>
+      {% endif %}
+    </div>
+
+  </div>
+
+
+  <!-- RIGHT SIDEBAR -->
+  <div>
+
+    <!-- Delivery Info -->
+    <div class="od-card sr" style="transition-delay:.1s">
+      <div class="od-card__title">📍 Delivery Details</div>
+
+      <div class="info-row">
+        <div class="info-icon">👤</div>
+        <div>
+          <div class="info-label">Name</div>
+          <div class="info-value">{{ order.full_name|default:"—" }}</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">📱</div>
+        <div>
+          <div class="info-label">Phone</div>
+          <div class="info-value">{{ order.phone|default:"—" }}</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">📍</div>
+        <div>
+          <div class="info-label">Address</div>
+          <div class="info-value">{{ order.address|default:"—" }}</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">📅</div>
+        <div>
+          <div class="info-label">Ordered On</div>
+          <div class="info-value">{{ order.created_at|date:"d M Y, h:i A" }}</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Need Help -->
+    <div class="od-card sr" style="transition-delay:.18s;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:10px;">🤝</div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--dark);margin-bottom:6px;">Need Help?</h3>
+      <p style="font-size:.84rem;color:var(--gray);margin-bottom:16px;">Having an issue with your order? Contact our support team.</p>
+      <a href="mailto:support@foodhub.com"
+         style="display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:#fff;padding:10px 22px;border-radius:99px;font-size:.86rem;font-weight:600;text-decoration:none;transition:all .2s;"
+         onmouseover="this.style.background='#FF7043'" onmouseout="this.style.background='#FF5722'">
+        ✉️ Contact Support
+      </a>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+  const els = document.querySelectorAll('.sr');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  els.forEach(el => obs.observe(el));
+  window.addEventListener('load', () => {
+    els.forEach(el => { if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('in'); });
+  });
+</script>
+
+{% endblock %}

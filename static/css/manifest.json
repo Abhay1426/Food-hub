@@ -1,0 +1,43 @@
+{
+  "name": "FoodHub - Order Food Online",
+  "short_name": "FoodHub",
+  "description": "Order fresh, delicious food delivered to your door!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFBF7",
+  "theme_color": "#FF5722",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/FF5722/ffffff?text=FH",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/FF5722/ffffff?text=FH",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "shopping"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Browse Menu",
+      "url": "/foods/",
+      "description": "Explore our full menu"
+    },
+    {
+      "name": "My Orders",
+      "url": "/orders/",
+      "description": "Track your orders"
+    },
+    {
+      "name": "Cart",
+      "url": "/cart/",
+      "description": "View your cart"
+    }
+  ]
+}

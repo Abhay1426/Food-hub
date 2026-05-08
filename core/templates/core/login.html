@@ -1,0 +1,115 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#FFF8F2!important}
+.content-wrap{background:#FFF8F2!important;padding:0!important}
+:root{--or:#FF5722;--or2:#FF7043;--dk:#1a1a1a;--cream:#FFF8F2;--gray:#6b7280;--border:#e5e7eb}
+.auth-page{min-height:calc(100vh - 68px);display:grid;grid-template-columns:1fr 1fr}
+/* LEFT */
+.auth-left{position:relative;overflow:hidden;background:#1a1a1a;display:flex;flex-direction:column;justify-content:flex-end;padding:48px;min-height:calc(100vh - 68px)}
+.al-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=900&q=80');background-size:cover;background-position:center;opacity:.55;transition:transform 6s ease}
+.auth-left:hover .al-bg{transform:scale(1.04)}
+.al-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.78) 100%)}
+.al-brand{position:absolute;top:40px;left:48px;z-index:2;font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:10px}
+.al-brand:hover{text-decoration:none;color:#fff}
+.al-brand-ic{width:36px;height:36px;background:var(--or);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.al-brand span{color:var(--or)}
+.al-content{position:relative;z-index:2}
+.al-quote{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,2.5vw,2.4rem);color:#fff;line-height:1.25;margin-bottom:14px}
+.al-quote em{font-style:italic;color:var(--or)}
+.al-sub{color:rgba(255,255,255,.6);font-size:.88rem;line-height:1.65;margin-bottom:24px}
+.al-badges{display:flex;gap:10px;flex-wrap:wrap}
+.al-badge{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:99px;color:#fff;font-size:.8rem;font-weight:500;display:flex;align-items:center;gap:5px}
+/* RIGHT */
+.auth-right{background:var(--cream);display:flex;align-items:center;justify-content:center;padding:50px 40px;min-height:calc(100vh - 68px)}
+.auth-form-wrap{width:100%;max-width:400px}
+.auth-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--dk);margin-bottom:5px}
+.auth-title span{color:var(--or)}
+.auth-sub{color:var(--gray);font-size:.9rem;margin-bottom:28px}
+.ig{margin-bottom:16px}
+.ig label{display:block;font-size:.8rem;font-weight:600;color:var(--dk);margin-bottom:6px}
+.ig input{width:100%;padding:13px 44px 13px 18px;border-radius:12px;border:1.5px solid var(--border);font-size:.93rem;font-family:'DM Sans',sans-serif;background:#fafafa;color:var(--dk);outline:none;transition:border .2s,box-shadow .2s}
+.ig input:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(255,87,34,.1);background:#fff}
+.ig input::placeholder{color:#bbb}
+.ig-icon{position:relative}
+.ig-icon .icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#bbb;font-size:.9rem;cursor:pointer}
+.ig-icon .icon:hover{color:var(--or)}
+.err-alert{background:#fff0f0;border:1px solid #fecaca;border-radius:12px;padding:11px 15px;color:#dc2626;font-size:.86rem;font-weight:500;margin-bottom:16px;display:none;align-items:center;gap:7px;animation:shake .4s ease}
+.err-alert.show{display:flex}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.forgot-link{display:block;text-align:right;font-size:.8rem;color:var(--or);font-weight:500;text-decoration:none;margin:-8px 0 18px}
+.forgot-link:hover{text-decoration:underline}
+.btn-auth{display:block;width:100%;background:var(--or);color:#fff;padding:15px;border-radius:12px;font-weight:700;font-size:.98rem;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s;box-shadow:0 5px 18px rgba(255,87,34,.3);text-align:center}
+.btn-auth:hover{background:var(--or2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,87,34,.4)}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:#ccc;font-size:.8rem}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-switch{text-align:center;font-size:.88rem;color:var(--gray);margin-top:16px}
+.auth-switch a{color:var(--or);font-weight:600;text-decoration:none}
+.auth-switch a:hover{text-decoration:underline}
+@media(max-width:760px){.auth-page{grid-template-columns:1fr}.auth-left{display:none}.auth-right{padding:40px 24px}}
+</style>
+
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="al-bg"></div>
+    <div class="al-overlay"></div>
+    <a href="/" class="al-brand"><div class="al-brand-ic">🍔</div>Food<span>Hub</span></a>
+    <div class="al-content">
+      <h2 class="al-quote">Good food,<br><em>good mood</em>,<br>every time.</h2>
+      <p class="al-sub">Order fresh, delicious meals from the best local kitchen. Fast delivery, every time.</p>
+      <div class="al-badges">
+        <div class="al-badge">🚀 30 min delivery</div>
+        <div class="al-badge">🌿 Fresh daily</div>
+        <div class="al-badge">⭐ 4.8 rated</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <h2 class="auth-title">Welcome <span>back!</span></h2>
+      <p class="auth-sub">Sign in to your account to continue ordering</p>
+
+      <div class="err-alert" id="errAlert">❌ &nbsp;Invalid username or password.</div>
+
+      <form id="loginForm">
+        {% csrf_token %}
+        <div class="ig">
+          <label>Username</label>
+          <div class="ig-icon">
+            <input type="text" name="username" placeholder="Enter your username" required autocomplete="username">
+            <span class="icon">👤</span>
+          </div>
+        </div>
+        <div class="ig">
+          <label>Password</label>
+          <div class="ig-icon">
+            <input type="password" name="password" id="pwdField" placeholder="Enter your password" required autocomplete="current-password">
+            <span class="icon" id="togglePwd" onclick="togglePwd()">👁</span>
+          </div>
+        </div>
+        <a href="{% url 'forgot_password' %}" class="forgot-link">Forgot password?</a>
+        <button type="submit" class="btn-auth" id="loginBtn">Sign In →</button>
+      </form>
+
+      <div class="auth-divider">or</div>
+      <div class="auth-switch">New to FoodHub? <a href="{% url 'register' %}">Create an account</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePwd(){const f=document.getElementById('pwdField');f.type=f.type==='password'?'text':'password';document.getElementById('togglePwd').textContent=f.type==='password'?'👁':'🙈'}
+document.getElementById('loginForm').addEventListener('submit',function(e){
+  e.preventDefault();const btn=document.getElementById('loginBtn');const err=document.getElementById('errAlert');
+  btn.textContent='⏳ Signing in...';btn.disabled=true;err.classList.remove('show');
+  fetch('/ajax-login/',{method:'POST',body:new FormData(this)}).then(r=>r.json()).then(d=>{
+    if(d.status==='success'){btn.textContent='✅ Redirecting...';setTimeout(()=>window.location.href='/',500)}
+    else{btn.textContent='Sign In →';btn.disabled=false;err.classList.add('show')}
+  }).catch(()=>{btn.textContent='Sign In →';btn.disabled=false})
+});
+</script>
+{% endblock %}

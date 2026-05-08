@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-box">
+
+        <h2>Verify OTP 🔐</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <input type="text" name="otp" placeholder="Enter OTP" class="form-control mb-3" required>
+
+            <button type="submit" class="auth-btn">Verify</button>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

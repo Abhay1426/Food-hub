@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<style>
+body { font-family:'DM Sans',sans-serif; background:#FFFBF7; }
+.fail-wrap {
+  min-height: 75vh; display:flex; align-items:center;
+  justify-content:center; padding:40px 5vw; text-align:center;
+}
+.fail-card {
+  background:#fff; border-radius:24px; padding:48px 40px;
+  box-shadow:0 4px 32px rgba(0,0,0,.08); max-width:420px; width:100%;
+}
+.fail-icon {
+  width:80px; height:80px; border-radius:50%;
+  background:#fee2e2; border:3px solid #dc2626;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; margin:0 auto 20px;
+}
+h2 { font-family:'Playfair Display',serif; font-size:1.8rem; color:#111; margin-bottom:8px; }
+p  { color:#6b7280; font-size:.92rem; margin-bottom:28px; line-height:1.6; }
+.btn-retry {
+  display:inline-block; background:#FF5722; color:#fff;
+  padding:14px 36px; border-radius:99px; font-weight:700;
+  text-decoration:none; margin-right:8px; transition:all .22s;
+}
+.btn-retry:hover { background:#FF7043; color:#fff; text-decoration:none; transform:translateY(-2px); }
+.btn-home {
+  display:inline-block; background:#f9fafb; color:#6b7280;
+  padding:14px 36px; border-radius:99px; font-weight:600;
+  text-decoration:none; border:1.5px solid #e5e7eb; transition:all .22s;
+}
+.btn-home:hover { color:#111; border-color:#111; text-decoration:none; }
+</style>
+<div class="fail-wrap">
+  <div class="fail-card">
+    <div class="fail-icon">❌</div>
+    <h2>Payment Failed!</h2>
+    <p>Something went wrong with your payment. Don't worry — your order is saved. Please try again or use Cash on Delivery.</p>
+    <a href="{% url 'checkout' %}" class="btn-retry">🔄 Try Again</a>
+    <a href="{% url 'home' %}" class="btn-home">🏠 Home</a>
+  </div>
+</div>
+{% endblock %}

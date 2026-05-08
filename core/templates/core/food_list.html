@@ -1,0 +1,175 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#FFF8F2!important}
+.content-wrap{background:#FFF8F2!important;padding:0!important}
+:root{--or:#FF5722;--or2:#FF7043;--dk:#1a1a1a;--cream:#FFF8F2;--gray:#6b7280;--border:#e5e7eb;--green:#16a34a}
+.pg-header{background:linear-gradient(135deg,#1a1a1a,#2d1200);padding:44px 6vw 38px;position:relative;overflow:hidden}
+.pg-header::after{content:'🍽️';position:absolute;right:6vw;top:50%;transform:translateY(-50%);font-size:6rem;opacity:.08}
+.pg-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.6rem);color:#fff;margin-bottom:4px}
+.pg-header h1 span{color:var(--or)}
+.pg-header p{color:rgba(255,255,255,.5);font-size:.9rem;margin:0}
+.filter-bar{background:#fff;border-bottom:1px solid #f0f0f0;padding:14px 6vw;position:sticky;top:68px;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.filter-inner{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.sbox{position:relative;flex:1;min-width:200px;max-width:380px}
+.sbox input{width:100%;padding:11px 44px 11px 18px;border-radius:12px;border:1.5px solid var(--border);font-size:.9rem;font-family:'DM Sans',sans-serif;background:#fafafa;color:var(--dk);outline:none;transition:border .2s,box-shadow .2s}
+.sbox input:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(255,87,34,.1);background:#fff}
+.sbox button{position:absolute;right:5px;top:50%;transform:translateY(-50%);background:var(--or);border:none;color:#fff;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+.sbox button:hover{background:var(--or2)}
+.cat-chips{display:flex;gap:8px;flex-wrap:wrap}
+.cat-chip{padding:7px 16px;border-radius:99px;border:1.5px solid var(--border);background:#fafafa;color:var(--gray);font-size:.82rem;font-weight:500;text-decoration:none;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.cat-chip:hover,.cat-chip.active{background:var(--or);border-color:var(--or);color:#fff;text-decoration:none;box-shadow:0 3px 10px rgba(255,87,34,.25)}
+.adv-panel{background:#fff8f5;border-bottom:1px solid #ffe0cc;padding:14px 6vw;display:none}
+.adv-panel.open{display:block}
+.adv-inner{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.af label{font-size:.72rem;font-weight:600;color:var(--gray);display:block;margin-bottom:4px}
+.af input,.af select{padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);font-size:.84rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff}
+.af input:focus,.af select:focus{border-color:var(--or)}
+.results-bar{padding:16px 6vw 6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.rtxt{font-size:.84rem;color:var(--gray);font-weight:500}
+.rtxt strong{color:var(--dk)}
+.clr{font-size:.8rem;color:var(--or);font-weight:600;text-decoration:none;padding:4px 12px;border-radius:99px;border:1px solid rgba(255,87,34,.25);transition:all .2s}
+.clr:hover{background:var(--or);color:#fff;text-decoration:none}
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:20px;padding:10px 5vw 60px}
+.fcard{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);transition:all .32s cubic-bezier(.25,.8,.25,1);border:1.5px solid transparent}
+.fcard:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(0,0,0,.12);border-color:rgba(255,87,34,.12)}
+.fcard-img{position:relative;height:192px;overflow:hidden;background:linear-gradient(135deg,#FFF3E0,#FFE0B2)}
+.fcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s ease;display:block}
+.fcard:hover .fcard-img img{transform:scale(1.08)}
+.fcard-cat{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.93);backdrop-filter:blur(6px);padding:3px 11px;border-radius:99px;font-size:.65rem;font-weight:700;color:var(--or);letter-spacing:.06em;text-transform:uppercase}
+.fcard-pop{position:absolute;top:12px;right:46px;background:var(--or);color:#fff;padding:3px 9px;border-radius:99px;font-size:.62rem;font-weight:700}
+.fcard-heart{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.93);backdrop-filter:blur(6px);border:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.fcard-heart:hover{transform:scale(1.2)}
+.fcard-heart.wishlisted{background:#fff0f3}
+.fcard-overlay{position:absolute;inset:0;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .28s}
+.fcard:hover .fcard-overlay{opacity:1}
+.btn-qadd{background:#fff;color:var(--dk);padding:10px 22px;border-radius:99px;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px;transform:translateY(10px);transition:transform .3s cubic-bezier(.23,.98,.28,.99),background .2s,color .2s}
+.fcard:hover .btn-qadd{transform:translateY(0)}
+.btn-qadd:hover{background:var(--or);color:#fff}
+.fcard-body{padding:14px 16px 18px}
+.fcard-r1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.fcard-name{font-family:'Playfair Display',serif;font-size:1.04rem;font-weight:700;color:var(--dk);line-height:1.3}
+.fcard-star{display:flex;align-items:center;gap:3px;background:#FFF8F2;border:1px solid #FFE0CC;padding:3px 8px;border-radius:99px;font-size:.68rem;font-weight:700;color:var(--or);flex-shrink:0}
+.fcard-desc{font-size:.79rem;color:var(--gray);line-height:1.5;margin-bottom:12px}
+.fcard-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f5f5f5;padding-top:11px}
+.fcard-price{font-size:1.15rem;font-weight:700;color:var(--dk)}
+.fcard-price sup{font-size:.65rem;color:var(--gray);vertical-align:super}
+.btn-actions{display:flex;gap:6px;align-items:center}
+.btn-view{font-size:.74rem;color:var(--or);font-weight:600;text-decoration:none;padding:5px 10px;border-radius:8px;border:1px solid rgba(255,87,34,.2);transition:all .2s;white-space:nowrap}
+.btn-view:hover{background:var(--or);color:#fff;text-decoration:none}
+.btn-add{background:var(--dk);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .22s;display:inline-flex;align-items:center;gap:4px}
+.btn-add:hover{background:var(--or);transform:scale(1.05)}
+.btn-add.ok{background:var(--green)!important}
+.empty-state{grid-column:1/-1;text-align:center;padding:72px 20px;background:#fff;border-radius:20px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+.empty-state .ei{font-size:4rem;margin-bottom:14px}
+.empty-state h3{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--dk);margin-bottom:8px}
+.empty-state p{color:var(--gray);margin-bottom:22px}
+.wtoast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--dk);color:#fff;padding:12px 22px;border-radius:14px;font-size:.88rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.2);z-index:9999;opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.34,1.56,.64,1),opacity .3s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.wtoast.on{transform:translateX(-50%) translateY(0);opacity:1}
+.sr{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease}
+.sr.in{opacity:1;transform:translateY(0)}
+@media(max-width:600px){.food-grid{grid-template-columns:1fr 1fr;gap:12px}.fcard-img{height:148px}.fcard-overlay{display:none}}
+@media(max-width:360px){.food-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="pg-header">
+  <h1>Explore Our <span>Menu</span></h1>
+  <p>Fresh, delicious, and ready to order — find your next favourite meal</p>
+</div>
+
+<div class="filter-bar">
+  <form method="GET" id="fForm" style="display:contents">
+    <div class="filter-inner">
+      <div class="sbox">
+        <input type="text" name="q" id="sInput" placeholder="🔍 Search pizza, biryani..." value="{{ request.GET.q|default:'' }}">
+        <button type="submit">→</button>
+      </div>
+      <div class="cat-chips">
+        <a href="{% url 'food_list' %}" class="cat-chip {% if not request.GET.category %}active{% endif %}">All</a>
+        {% for cat in categories %}
+        <a href="?category={{ cat.id }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="cat-chip {% if request.GET.category == cat.id|stringformat:'s' %}active{% endif %}">{{ cat.name }}</a>
+        {% endfor %}
+      </div>
+      <button type="button" onclick="document.getElementById('advP').classList.toggle('open')"
+              style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;border:1.5px solid var(--border);background:#fafafa;color:var(--gray);font-size:.82rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s"
+              onmouseover="this.style.borderColor='#FF5722';this.style.color='#FF5722'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#6b7280'">
+        ⚙️ Filters
+      </button>
+    </div>
+  </form>
+</div>
+
+<div class="adv-panel" id="advP" {% if sort_by or min_price or max_price %}style="display:block"{% endif %}>
+  <form method="GET" class="adv-inner">
+    <input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
+    <input type="hidden" name="category" value="{{ request.GET.category|default:'' }}">
+    <div class="af"><label>Min ₹</label><input type="number" name="min_price" value="{{ min_price }}" placeholder="0" style="width:90px"></div>
+    <div class="af"><label>Max ₹</label><input type="number" name="max_price" value="{{ max_price }}" placeholder="999" style="width:90px"></div>
+    <div class="af"><label>Sort</label>
+      <select name="sort">
+        <option value="">Default</option>
+        <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price ↑</option>
+        <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price ↓</option>
+        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name A→Z</option>
+      </select>
+    </div>
+    <button type="submit" style="background:var(--or);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-weight:700;font-size:.84rem;cursor:pointer;font-family:'DM Sans',sans-serif">Apply</button>
+    <a href="{% url 'food_list' %}" style="padding:9px 14px;border-radius:10px;border:1.5px solid var(--border);color:var(--gray);font-size:.82rem;font-weight:500;text-decoration:none">Reset</a>
+  </form>
+</div>
+
+<div class="results-bar sr">
+  <div class="rtxt">Showing <strong>{{ foods|length }}</strong> item{{ foods|length|pluralize }}{% if request.GET.q %} for "<strong>{{ request.GET.q }}</strong>"{% endif %}</div>
+  {% if request.GET.q or request.GET.category %}<a href="{% url 'food_list' %}" class="clr">✕ Clear</a>{% endif %}
+</div>
+
+<div class="food-grid">
+  {% for food in foods %}
+  <div class="fcard sr" style="transition-delay:{{ forloop.counter0 }}40ms">
+    <div class="fcard-img">
+      {% if food.image %}<img src="{{ food.image.url }}" alt="{{ food.name }}" loading="lazy">
+      {% else %}<img src="https://source.unsplash.com/600x420/?{{ food.name|urlencode }},food" alt="{{ food.name }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80'">{% endif %}
+      <span class="fcard-cat">{{ food.category.name }}</span>
+      {% if forloop.counter <= 3 %}<span class="fcard-pop">🔥 Hot</span>{% endif %}
+      <button class="fcard-heart wl-toggle" data-id="{{ food.id }}">🤍</button>
+      <div class="fcard-overlay"><button class="btn-qadd hp-ajax" data-id="{{ food.id }}" data-name="{{ food.name }}">🛒 Quick Add</button></div>
+    </div>
+    <div class="fcard-body">
+      <div class="fcard-r1">
+        <h3 class="fcard-name">{{ food.name }}</h3>
+        <div class="fcard-star">⭐ {% if food.avg_rating %}{{ food.avg_rating }}{% else %}New{% endif %}</div>
+      </div>
+      <p class="fcard-desc">{{ food.description|truncatewords:12|default:"Freshly prepared with finest ingredients." }}</p>
+      <div class="fcard-foot">
+        <div class="fcard-price"><sup>₹</sup>{{ food.price }}</div>
+        <div class="btn-actions">
+          <a href="{% url 'food_detail' food.id %}" class="btn-view">View</a>
+          <button class="btn-add hp-ajax" data-id="{{ food.id }}" data-name="{{ food.name }}">＋ Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state"><div class="ei">🍽️</div><h3>No dishes found</h3><p>Try different search</p><a href="{% url 'food_list' %}" style="background:var(--or);color:#fff;padding:11px 24px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-block">Browse All</a></div>
+  {% endfor %}
+</div>
+
+<div class="wtoast" id="wT">🛒 <span id="wTM">Added!</span></div>
+
+<script>
+(function(){
+  let t;
+  function toast(m){const e=document.getElementById('wT');document.getElementById('wTM').textContent=m;e.classList.add('on');clearTimeout(t);t=setTimeout(()=>e.classList.remove('on'),2600)}
+  function badge(n){let b=document.querySelector('.cart-badge');if(!b&&n>0){const a=document.querySelector('a[href="/cart/"]');if(a){b=document.createElement('span');b.className='cart-badge';a.appendChild(b)}}if(b)b.textContent=n}
+  document.querySelectorAll('.hp-ajax').forEach(btn=>{btn.addEventListener('click',function(e){e.stopPropagation();const id=this.dataset.id,name=this.dataset.name,orig=this.innerHTML;this.disabled=true;this.style.opacity='.6';fetch('/add-to-cart/'+id+'/',{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.json()).then(d=>{this.disabled=false;this.style.opacity='1';this.classList.add('ok');this.innerHTML='✓';toast(name+' added!');badge(d.cart_count);setTimeout(()=>{this.classList.remove('ok');this.innerHTML=orig},1600)}).catch(()=>window.location.href='/add-to-cart/'+id+'/')})});
+  document.querySelectorAll('.wl-toggle').forEach(btn=>{btn.addEventListener('click',function(e){e.stopPropagation();const id=this.dataset.id,s=this;fetch('/wishlist/toggle/'+id+'/',{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.json()).then(d=>{if(d.wishlisted){s.textContent='❤️';s.classList.add('wishlisted');toast('Added to wishlist! ❤️')}else{s.textContent='🤍';s.classList.remove('wishlisted');toast('Removed from wishlist')}})})});
+  const wids=new Set({{ wishlist_ids|safe }});
+  document.querySelectorAll('.wl-toggle').forEach(b=>{if(wids.has(parseInt(b.dataset.id))){b.textContent='❤️';b.classList.add('wishlisted')}});
+  let deb;document.getElementById('sInput').addEventListener('input',function(){clearTimeout(deb);deb=setTimeout(()=>document.getElementById('fForm').submit(),600)});
+  const els=document.querySelectorAll('.sr');const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.07});els.forEach(el=>io.observe(el));window.addEventListener('load',()=>{els.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('in')})});
+})();
+</script>
+{% endblock %}

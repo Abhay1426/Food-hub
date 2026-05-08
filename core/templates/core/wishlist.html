@@ -1,0 +1,100 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#FFF8F2!important}
+.content-wrap{background:#FFF8F2!important;padding:0!important}
+:root{--or:#FF5722;--or2:#FF7043;--dk:#1a1a1a;--cream:#FFF8F2;--gray:#6b7280;--border:#e5e7eb;--green:#16a34a}
+.pg-header{background:linear-gradient(135deg,#1a1a1a,#1a0005);padding:44px 6vw 38px;position:relative;overflow:hidden}
+.pg-header::after{content:'❤️';position:absolute;right:6vw;top:50%;transform:translateY(-50%);font-size:6rem;opacity:.08}
+.pg-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.6rem);color:#fff;margin-bottom:4px}
+.pg-header h1 span{color:#ff4d6d}
+.pg-header p{color:rgba(255,255,255,.5);font-size:.9rem;margin:0}
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;padding:28px 5vw 60px}
+.wcard{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);transition:all .32s cubic-bezier(.25,.8,.25,1);animation:fadeUp .4s ease both;border:1.5px solid transparent}
+.wcard:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(0,0,0,.12);border-color:rgba(255,87,34,.12)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.wcard-img{position:relative;height:190px;overflow:hidden;background:linear-gradient(135deg,#FFF3E0,#FFE0B2)}
+.wcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s ease;display:block}
+.wcard:hover .wcard-img img{transform:scale(1.07)}
+.wcard-cat{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.93);backdrop-filter:blur(6px);padding:3px 11px;border-radius:99px;font-size:.65rem;font-weight:700;color:var(--or);letter-spacing:.06em;text-transform:uppercase}
+.btn-heart{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.93);backdrop-filter:blur(6px);border:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.btn-heart:hover{transform:scale(1.15);background:#fff0f3}
+.wcard-body{padding:15px 17px 18px}
+.wcard-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--dk);margin-bottom:5px}
+.wcard-desc{font-size:.8rem;color:var(--gray);line-height:1.5;margin-bottom:13px}
+.wcard-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f5f5f5;padding-top:12px}
+.wcard-price{font-size:1.15rem;font-weight:700;color:var(--dk)}
+.wcard-price sup{font-size:.65rem;color:var(--gray);vertical-align:super}
+.btn-add-wish{background:var(--dk);color:#fff;border:none;padding:9px 17px;border-radius:10px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .22s;display:inline-flex;align-items:center;gap:4px}
+.btn-add-wish:hover{background:var(--or);transform:scale(1.05)}
+.btn-add-wish.ok{background:var(--green)!important}
+.empty-wish{grid-column:1/-1;text-align:center;padding:72px 20px;background:#fff;border-radius:20px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+.empty-wish .ei{font-size:4rem;margin-bottom:14px}
+.empty-wish h3{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--dk);margin-bottom:8px}
+.empty-wish p{color:var(--gray);margin-bottom:22px}
+.wtoast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--dk);color:#fff;padding:12px 22px;border-radius:14px;font-size:.88rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.2);z-index:9999;opacity:0;pointer-events:none;transition:transform .38s cubic-bezier(.34,1.56,.64,1),opacity .3s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.wtoast.on{transform:translateX(-50%) translateY(0);opacity:1}
+@media(max-width:600px){.wish-grid{grid-template-columns:1fr 1fr;gap:12px}.wcard-img{height:148px}}
+</style>
+
+<div class="pg-header">
+  <h1>My <span>Wishlist</span></h1>
+  <p>{{ count }} item{{ count|pluralize }} saved for later</p>
+</div>
+
+<div class="wish-grid">
+  {% for item in wishlist_items %}
+  <div class="wcard" id="wc-{{ item.food.id }}" style="animation-delay:{{ forloop.counter0 }}50ms">
+    <div class="wcard-img">
+      {% if item.food.image %}<img src="{{ item.food.image.url }}" alt="{{ item.food.name }}" loading="lazy">
+      {% else %}<img src="https://source.unsplash.com/600x400/?{{ item.food.name|urlencode }},food" alt="{{ item.food.name }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80'">{% endif %}
+      <span class="wcard-cat">{{ item.food.category.name }}</span>
+      <button class="btn-heart wl-toggle" data-id="{{ item.food.id }}" title="Remove">❤️</button>
+    </div>
+    <div class="wcard-body">
+      <h3 class="wcard-name">{{ item.food.name }}</h3>
+      <p class="wcard-desc">{{ item.food.description|truncatewords:13|default:"Freshly prepared with finest ingredients." }}</p>
+      <div class="wcard-foot">
+        <div class="wcard-price"><sup>₹</sup>{{ item.food.price }}</div>
+        <button class="btn-add-wish hp-ajax" data-id="{{ item.food.id }}" data-name="{{ item.food.name }}">🛒 Add to Cart</button>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-wish">
+    <div class="ei">💔</div>
+    <h3>Wishlist is empty!</h3>
+    <p>Browse our menu and heart your favourites!</p>
+    <a href="{% url 'food_list' %}" style="background:var(--or);color:#fff;padding:12px 28px;border-radius:12px;font-weight:700;text-decoration:none;box-shadow:0 5px 18px rgba(255,87,34,.3);display:inline-block">🍽️ Browse Menu</a>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="wtoast" id="wT">🛒 <span id="wTM">Done!</span></div>
+
+<script>
+(function(){
+  let t;
+  function toast(m){const e=document.getElementById('wT');document.getElementById('wTM').textContent=m;e.classList.add('on');clearTimeout(t);t=setTimeout(()=>e.classList.remove('on'),2500)}
+  function badge(n){let b=document.querySelector('.cart-badge');if(!b&&n>0){const a=document.querySelector('a[href="/cart/"]');if(a){b=document.createElement('span');b.className='cart-badge';a.appendChild(b)}}if(b)b.textContent=n}
+
+  document.querySelectorAll('.wl-toggle').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      const id=this.dataset.id,card=document.getElementById('wc-'+id);
+      fetch('/wishlist/toggle/'+id+'/',{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.json()).then(d=>{
+        if(!d.wishlisted){card.style.transition='all .4s ease';card.style.opacity='0';card.style.transform='scale(0.85)';setTimeout(()=>card.remove(),400);toast('💔 Removed from wishlist');
+          const hdr=document.querySelector('.pg-header p');if(hdr){const rem=document.querySelectorAll('.wcard').length-1;hdr.textContent=rem+' item'+(rem!==1?'s':'')+' saved for later';if(rem===0)location.reload()}}
+      })
+    })
+  });
+
+  document.querySelectorAll('.hp-ajax').forEach(btn=>{
+    btn.addEventListener('click',function(e){e.stopPropagation();const id=this.dataset.id,name=this.dataset.name,orig=this.innerHTML;this.disabled=true;this.style.opacity='.6';
+    fetch('/add-to-cart/'+id+'/',{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.json()).then(d=>{this.disabled=false;this.style.opacity='1';this.classList.add('ok');this.innerHTML='✓ Added!';toast(name+' added to cart!');badge(d.cart_count);setTimeout(()=>{this.classList.remove('ok');this.innerHTML=orig},1700)}).catch(()=>window.location.href='/add-to-cart/'+id+'/')})
+  });
+})();
+</script>
+{% endblock %}

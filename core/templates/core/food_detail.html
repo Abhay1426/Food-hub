@@ -1,0 +1,624 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --or: #FF5722; --or2: #FF7043;
+  --dk: #111; --cr: #FFFBF7;
+  --gy: #6b7280; --bd: #e5e7eb;
+  --star: #f59e0b;
+}
+* { box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cr); }
+
+/* ── HERO ── */
+.fd-hero {
+  position: relative; height: 420px; overflow: hidden;
+  background: var(--dk);
+}
+.fd-hero__img {
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: .55; transition: transform 6s ease;
+}
+.fd-hero:hover .fd-hero__img { transform: scale(1.04); }
+.fd-hero__overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.25) 60%, transparent 100%);
+}
+.fd-hero__content {
+  position: absolute; bottom: 36px; left: 6vw; right: 6vw;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-wrap: wrap; gap: 16px;
+}
+.fd-hero__cat {
+  background: var(--or); color: #fff;
+  padding: 4px 14px; border-radius: 99px;
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  display: inline-block; margin-bottom: 10px;
+}
+.fd-hero__name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: #fff; font-weight: 700; line-height: 1.1; margin: 0 0 8px;
+}
+.fd-hero__meta {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.fd-hero__price {
+  font-size: 1.6rem; font-weight: 700; color: #fff;
+}
+.fd-hero__price sup { font-size: .8rem; opacity: .7; vertical-align: super; }
+
+.fd-hero__stars { display: flex; align-items: center; gap: 4px; }
+.fd-hero__stars .s { font-size: 1rem; }
+.fd-hero__avg { color: #fff; font-weight: 700; font-size: 1rem; margin-left: 4px; }
+.fd-hero__cnt { color: rgba(255,255,255,.55); font-size: .84rem; }
+
+.btn-add-hero {
+  background: var(--or); color: #fff;
+  padding: 14px 32px; border-radius: 99px;
+  font-weight: 700; font-size: 1rem; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 6px 20px rgba(255,87,34,.4);
+  transition: all .25s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-add-hero:hover {
+  background: var(--or2); transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(255,87,34,.5);
+}
+.btn-add-hero.ok { background: #16a34a; }
+
+/* ── LAYOUT ── */
+.fd-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  padding: 36px 5vw 60px;
+  align-items: start;
+}
+@media (max-width: 860px) { .fd-layout { grid-template-columns: 1fr; } }
+
+/* ── SECTION CARD ── */
+.fd-card {
+  background: #fff; border-radius: 20px; padding: 28px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07); margin-bottom: 22px;
+}
+.fd-card__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; font-weight: 700; color: var(--dk);
+  margin: 0 0 18px; padding-bottom: 14px;
+  border-bottom: 1.5px solid #f0f0f0;
+}
+
+/* description */
+.fd-desc { font-size: .95rem; color: var(--gy); line-height: 1.75; }
+
+/* ── RATING SUMMARY ── */
+.rating-summary {
+  display: flex; gap: 24px; align-items: center;
+  margin-bottom: 20px; flex-wrap: wrap;
+}
+.rating-big {
+  text-align: center; flex-shrink: 0;
+}
+.rating-big__n {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem; font-weight: 700; color: var(--dk); line-height: 1;
+}
+.rating-big__stars {
+  display: flex; gap: 2px; justify-content: center; margin: 6px 0 4px;
+}
+.rating-big__cnt { font-size: .82rem; color: var(--gy); }
+
+.rating-bars { flex: 1; min-width: 180px; }
+.rating-bar-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
+.rating-bar-row span { font-size: .78rem; color: var(--gy); width: 14px; flex-shrink: 0; }
+.rating-bar-track {
+  flex: 1; height: 6px; background: #f0f0f0; border-radius: 99px; overflow: hidden;
+}
+.rating-bar-fill {
+  height: 100%; background: var(--star); border-radius: 99px;
+  transition: width .8s cubic-bezier(.25,.8,.25,1);
+}
+.rating-bar-count { font-size: .76rem; color: var(--gy); width: 22px; text-align: right; flex-shrink: 0; }
+
+/* ── STAR PICKER ── */
+.star-picker {
+  display: flex; gap: 6px; margin-bottom: 14px;
+  flex-direction: row-reverse; justify-content: flex-end;
+}
+.star-picker input { display: none; }
+.star-picker label {
+  font-size: 2rem; cursor: pointer; color: #ddd;
+  transition: color .15s, transform .15s;
+}
+.star-picker input:checked ~ label,
+.star-picker label:hover,
+.star-picker label:hover ~ label {
+  color: var(--star);
+}
+.star-picker label:hover { transform: scale(1.15); }
+
+/* review form */
+.review-form textarea {
+  width: 100%; padding: 12px 16px; border-radius: 12px;
+  border: 1.5px solid var(--bd); font-size: .9rem;
+  font-family: 'DM Sans', sans-serif; color: var(--dk);
+  resize: vertical; min-height: 90px; outline: none;
+  transition: border .2s; background: #fafafa;
+}
+.review-form textarea:focus {
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px rgba(255,87,34,.1);
+  background: #fff;
+}
+.btn-review-submit {
+  background: var(--dk); color: #fff; border: none;
+  padding: 12px 28px; border-radius: 99px;
+  font-weight: 700; font-size: .9rem; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all .22s;
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-top: 12px;
+}
+.btn-review-submit:hover { background: var(--or); transform: translateY(-2px); }
+
+.review-login-note {
+  text-align: center; padding: 20px;
+  color: var(--gy); font-size: .9rem;
+}
+.review-login-note a { color: var(--or); font-weight: 600; text-decoration: none; }
+
+/* ── REVIEW CARDS ── */
+.review-card {
+  padding: 18px 0; border-bottom: 1px solid #f5f5f5;
+  animation: fadeUp .4s ease both;
+}
+.review-card:last-child { border-bottom: none; padding-bottom: 0; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.review-card__top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; flex-wrap: wrap; gap: 8px;
+}
+.review-card__user {
+  display: flex; align-items: center; gap: 10px;
+}
+.review-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--or), #e64a19);
+  color: #fff; font-weight: 700; font-size: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.review-username { font-weight: 600; font-size: .9rem; color: var(--dk); }
+.review-date     { font-size: .76rem; color: var(--gy); margin-top: 1px; }
+.review-stars    { display: flex; gap: 2px; }
+.review-stars .s { font-size: .9rem; }
+.review-comment  { font-size: .88rem; color: var(--gy); line-height: 1.6; }
+.review-yours {
+  background: #fff8f5; border: 1px solid #ffe0cc;
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 4px;
+}
+.btn-del-review {
+  background: none; border: none; color: #ef4444; font-size: .78rem;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  padding: 4px 10px; border-radius: 99px; transition: background .2s;
+}
+.btn-del-review:hover { background: #fee2e2; }
+
+.no-reviews {
+  text-align: center; padding: 32px 0;
+  color: var(--gy); font-size: .9rem;
+}
+.no-reviews .emoji { font-size: 2.5rem; margin-bottom: 8px; }
+
+/* ── STICKY SIDEBAR ── */
+.fd-sidebar { position: sticky; top: 90px; }
+
+.fd-info-card {
+  background: #fff; border-radius: 20px; padding: 24px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07); margin-bottom: 20px;
+}
+.fd-info-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+  font-size: .88rem;
+}
+.fd-info-row:last-child { border-bottom: none; }
+.fd-info-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #fff8f5; border: 1px solid #ffe0cc;
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  flex-shrink: 0;
+}
+.fd-info-label { color: var(--gy); font-size: .76rem; }
+.fd-info-val { color: var(--dk); font-weight: 600; margin-top: 1px; }
+
+/* related foods */
+.related-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.rel-card {
+  background: #fff; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  text-decoration: none; transition: transform .25s, box-shadow .25s;
+  display: block;
+}
+.rel-card:hover { transform: translateY(-4px); box-shadow: 0 8px 22px rgba(0,0,0,.1); text-decoration: none; }
+.rel-card img { width: 100%; height: 90px; object-fit: cover; display: block; }
+.rel-card__body { padding: 8px 10px 10px; }
+.rel-card__name { font-size: .82rem; font-weight: 600; color: var(--dk); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rel-card__price { font-size: .78rem; color: var(--or); font-weight: 700; }
+
+/* star helper */
+.star-filled { color: var(--star); }
+.star-empty  { color: #e5e7eb; }
+
+/* toast */
+.fd-toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(70px);
+  background: var(--dk); color: #fff;
+  padding: 13px 24px; border-radius: 99px;
+  font-size: .9rem; font-weight: 600;
+  box-shadow: 0 8px 28px rgba(0,0,0,.22);
+  z-index: 9999; opacity: 0; pointer-events: none; white-space: nowrap;
+  transition: transform .38s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+}
+.fd-toast.on { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.sr { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+.sr.in { opacity: 1; transform: translateY(0); }
+</style>
+
+
+<!-- ── HERO ── -->
+<div class="fd-hero">
+  {% if food.image %}
+    <img class="fd-hero__img" src="{{ food.image.url }}" alt="{{ food.name }}">
+  {% else %}
+    <img class="fd-hero__img"
+         src="https://source.unsplash.com/1400x500/?{{ food.name|urlencode }},food"
+         alt="{{ food.name }}"
+         onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80'">
+  {% endif %}
+  <div class="fd-hero__overlay"></div>
+
+  <div class="fd-hero__content">
+    <div>
+      <span class="fd-hero__cat">{{ food.category.name }}</span>
+      <h1 class="fd-hero__name">{{ food.name }}</h1>
+      <div class="fd-hero__meta">
+        <div class="fd-hero__price"><sup>₹</sup>{{ food.price }}</div>
+        <div class="fd-hero__stars">
+          {% for i in star_range %}
+            {% if i <= avg %}<span class="s">⭐</span>
+            {% else %}<span class="s" style="opacity:.3">⭐</span>{% endif %}
+          {% endfor %}
+          <span class="fd-hero__avg">{{ avg }}</span>
+          <span class="fd-hero__cnt">({{ count }} reviews)</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn-add-hero hp-ajax" data-id="{{ food.id }}" data-name="{{ food.name }}">
+      🛒 &nbsp;Add to Cart
+    </button>
+  </div>
+</div>
+
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="fd-layout">
+
+  <!-- LEFT COLUMN -->
+  <div>
+
+    <!-- Description -->
+    <div class="fd-card sr">
+      <div class="fd-card__title">📋 About this Dish</div>
+      <p class="fd-desc">{{ food.description|default:"A delicious dish prepared with the finest fresh ingredients. Served hot and ready to enjoy." }}</p>
+    </div>
+
+
+    <!-- RATINGS SECTION -->
+    <div class="fd-card sr" style="transition-delay:.08s">
+      <div class="fd-card__title">⭐ Ratings & Reviews</div>
+
+      <!-- Summary -->
+      {% if count > 0 %}
+      <div class="rating-summary">
+        <div class="rating-big">
+          <div class="rating-big__n">{{ avg }}</div>
+          <div class="rating-big__stars">
+            {% for i in star_range %}
+              {% if i <= avg %}<span style="color:var(--star);font-size:1.1rem;">★</span>
+              {% else %}<span style="color:#e5e7eb;font-size:1.1rem;">★</span>{% endif %}
+            {% endfor %}
+          </div>
+          <div class="rating-big__cnt">{{ count }} review{{ count|pluralize }}</div>
+        </div>
+
+        <div class="rating-bars">
+          {% for star, data in breakdown.items %}
+          <div class="rating-bar-row">
+            <span>{{ star }}</span>
+            <div class="rating-bar-track">
+              <div class="rating-bar-fill" style="width:{{ data.pct }}%"></div>
+            </div>
+            <span class="rating-bar-count">{{ data.count }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+
+      <!-- WRITE A REVIEW -->
+      {% if user_review %}
+      <!-- User already reviewed — show their review with edit option -->
+      <div class="review-yours">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-weight:700;font-size:.88rem;color:var(--or);">✅ Your Review</span>
+          <button class="btn-del-review" id="delBtn"
+                  data-url="{% url 'delete_review' food.id %}">
+            🗑 Delete
+          </button>
+        </div>
+        <div class="review-stars" style="margin-bottom:6px;">
+          {% for i in star_range %}
+            {% if i <= user_review.rating %}
+              <span class="s" style="color:var(--star);font-size:1.1rem;">★</span>
+            {% else %}
+              <span class="s" style="color:#e5e7eb;font-size:1.1rem;">★</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <p style="font-size:.88rem;color:var(--gy);margin:0;">
+          {{ user_review.comment|default:"No comment added." }}
+        </p>
+      </div>
+      <p style="font-size:.8rem;color:var(--gy);margin-bottom:16px;">
+        Want to update? Delete your review and write a new one.
+      </p>
+
+      {% else %}
+      <!-- Write new review -->
+      <div style="margin-bottom:24px;">
+        <p style="font-size:.88rem;color:var(--gy);margin-bottom:12px;font-weight:500;">Rate this dish:</p>
+
+        <form class="review-form" id="reviewForm">
+          {% csrf_token %}
+
+          <!-- Star picker (CSS only, no JS needed) -->
+          <div class="star-picker" id="starPicker">
+            <input type="radio" name="rating" id="s5" value="5"><label for="s5" title="5 stars">★</label>
+            <input type="radio" name="rating" id="s4" value="4"><label for="s4" title="4 stars">★</label>
+            <input type="radio" name="rating" id="s3" value="3"><label for="s3" title="3 stars">★</label>
+            <input type="radio" name="rating" id="s2" value="2"><label for="s2" title="2 stars">★</label>
+            <input type="radio" name="rating" id="s1" value="1"><label for="s1" title="1 star">★</label>
+          </div>
+
+          <textarea name="comment" id="reviewComment"
+                    placeholder="Share your experience with this dish... (optional)"
+                    rows="3"></textarea>
+
+          <button type="submit" class="btn-review-submit" id="reviewSubmitBtn">
+            ✍️ &nbsp;Submit Review
+          </button>
+        </form>
+      </div>
+      {% endif %}
+
+
+      <!-- ALL REVIEWS LIST -->
+      <div id="reviewsList">
+        {% if reviews %}
+          {% for review in reviews %}
+          {% if review.user != request.user %}
+          <div class="review-card">
+            <div class="review-card__top">
+              <div class="review-card__user">
+                <div class="review-avatar">{{ review.user.username|slice:":1"|upper }}</div>
+                <div>
+                  <div class="review-username">{{ review.user.username }}</div>
+                  <div class="review-date">{{ review.created_at|date:"d M Y" }}</div>
+                </div>
+              </div>
+              <div class="review-stars">
+                {% for i in star_range %}
+                  {% if i <= review.rating %}
+                    <span class="s" style="color:var(--star);font-size:1rem;">★</span>
+                  {% else %}
+                    <span class="s" style="color:#e5e7eb;font-size:1rem;">★</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            {% if review.comment %}
+            <p class="review-comment">{{ review.comment }}</p>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% endfor %}
+        {% else %}
+          <div class="no-reviews" id="noReviews">
+            <div class="emoji">💬</div>
+            <p>No reviews yet. Be the first to review!</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </div><!-- end ratings card -->
+
+  </div><!-- end left -->
+
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="fd-sidebar">
+
+    <!-- Quick Info -->
+    <div class="fd-info-card sr" style="transition-delay:.1s">
+      <div class="fd-card__title" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid #f0f0f0;">
+        🍽️ Quick Info
+      </div>
+      <div class="fd-info-row">
+        <div class="fd-info-icon">💰</div>
+        <div><div class="fd-info-label">Price</div><div class="fd-info-val">₹{{ food.price }}</div></div>
+      </div>
+      <div class="fd-info-row">
+        <div class="fd-info-icon">🏷️</div>
+        <div><div class="fd-info-label">Category</div><div class="fd-info-val">{{ food.category.name }}</div></div>
+      </div>
+      <div class="fd-info-row">
+        <div class="fd-info-icon">⭐</div>
+        <div><div class="fd-info-label">Rating</div><div class="fd-info-val">{{ avg }} / 5 ({{ count }} reviews)</div></div>
+      </div>
+      <div class="fd-info-row">
+        <div class="fd-info-icon">🚀</div>
+        <div><div class="fd-info-label">Delivery</div><div class="fd-info-val">25–35 minutes</div></div>
+      </div>
+
+      <button class="btn-add-hero hp-ajax" data-id="{{ food.id }}" data-name="{{ food.name }}"
+              style="width:100%;margin-top:18px;justify-content:center;">
+        🛒 &nbsp;Add to Cart
+      </button>
+    </div>
+
+    <!-- Related Foods -->
+    {% if related %}
+    <div class="fd-info-card sr" style="transition-delay:.18s">
+      <div class="fd-card__title" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid #f0f0f0;">
+        🍴 You Might Also Like
+      </div>
+      <div class="related-grid">
+        {% for item in related %}
+        <a href="{% url 'food_detail' item.id %}" class="rel-card">
+          {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.name }}">
+          {% else %}
+            <img src="https://source.unsplash.com/200x90/?{{ item.name|urlencode }},food"
+                 alt="{{ item.name }}"
+                 onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&q=80'">
+          {% endif %}
+          <div class="rel-card__body">
+            <div class="rel-card__name">{{ item.name }}</div>
+            <div class="rel-card__price">₹{{ item.price }}</div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- end sidebar -->
+
+</div><!-- end layout -->
+
+<!-- Toast -->
+<div class="fd-toast" id="fdToast">🛒 Added to cart!</div>
+
+
+<script>
+(function(){
+  const csrf = '{{ csrf_token }}';
+  let toastTmr;
+
+  function toast(msg) {
+    const el = document.getElementById('fdToast');
+    el.textContent = msg;
+    el.classList.add('on');
+    clearTimeout(toastTmr);
+    toastTmr = setTimeout(() => el.classList.remove('on'), 2600);
+  }
+
+  function updateBadge(n) {
+    let b = document.querySelector('.cart-badge');
+    if (!b && n > 0) {
+      const a = document.querySelector('a[href="/cart/"]');
+      if (a) { b = document.createElement('span'); b.className = 'cart-badge'; a.appendChild(b); }
+    }
+    if (b) b.textContent = n;
+  }
+
+  /* ── Add to cart ── */
+  document.querySelectorAll('.hp-ajax').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const id = this.dataset.id, name = this.dataset.name;
+      const orig = this.innerHTML; this.disabled = true; this.style.opacity = '.7';
+      fetch('/add-to-cart/' + id + '/', { headers: {'X-Requested-With':'XMLHttpRequest'} })
+        .then(r => r.json())
+        .then(d => {
+          this.disabled = false; this.style.opacity = '1';
+          this.classList.add('ok'); this.innerHTML = '✓ Added!';
+          toast('🛒 ' + name + ' added to cart!');
+          updateBadge(d.cart_count);
+          setTimeout(() => { this.classList.remove('ok'); this.innerHTML = orig; }, 1800);
+        })
+        .catch(() => { window.location.href = '/add-to-cart/' + id + '/'; });
+    });
+  });
+
+  /* ── Submit review ── */
+  const rForm = document.getElementById('reviewForm');
+  if (rForm) {
+    rForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const rating = document.querySelector('input[name="rating"]:checked');
+      if (!rating) { toast('⚠️ Please select a star rating!'); return; }
+
+      const fd = new FormData(this);
+      const btn = document.getElementById('reviewSubmitBtn');
+      btn.disabled = true; btn.textContent = 'Submitting...';
+
+      fetch('{% url "submit_review" food.id %}', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrf },
+        body: fd
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'success') {
+          toast('✅ Review submitted! Thanks!');
+          setTimeout(() => location.reload(), 1200);
+        }
+      })
+      .catch(() => { btn.disabled = false; btn.textContent = '✍️ Submit Review'; });
+    });
+  }
+
+  /* ── Delete review ── */
+  const delBtn = document.getElementById('delBtn');
+  if (delBtn) {
+    delBtn.addEventListener('click', function() {
+      if (!confirm('Delete your review?')) return;
+      fetch(this.dataset.url, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrf }
+      })
+      .then(r => r.json())
+      .then(d => { if (d.status === 'deleted') { toast('Review deleted'); setTimeout(() => location.reload(), 1000); } });
+    });
+  }
+
+  /* ── Scroll reveal ── */
+  const els = document.querySelectorAll('.sr');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  els.forEach(el => obs.observe(el));
+  window.addEventListener('load', () => {
+    els.forEach(el => { if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('in'); });
+  });
+})();
+</script>
+
+{% endblock %}

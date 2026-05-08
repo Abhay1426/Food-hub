@@ -1,0 +1,119 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root { --orange:#FF5722; --orange2:#FF7043; --dark:#111; --cream:#FFFBF7; --gray:#6b7280; --border:#e5e7eb; --green:#16a34a; }
+* { box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); }
+
+.page-header {
+  background:linear-gradient(135deg,var(--dark) 0%,#001a10 100%);
+  padding:44px 6vw 38px; position:relative; overflow:hidden;
+}
+.page-header::before { content:'📍'; position:absolute; right:6vw; top:50%; transform:translateY(-50%); font-size:6rem; opacity:.08; }
+.page-header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3.5vw,2.6rem); color:#fff; margin-bottom:4px; }
+.page-header h1 span { color:var(--orange); }
+.page-header p { color:rgba(255,255,255,.5); font-size:.9rem; margin:0; }
+
+.addr-wrap { padding:32px 5vw 60px; max-width:700px; margin:0 auto; }
+
+.addr-card {
+  background:#fff; border-radius:18px; padding:22px 24px;
+  box-shadow:0 2px 14px rgba(0,0,0,.07); margin-bottom:16px;
+  display:flex; justify-content:space-between; align-items:flex-start;
+  gap:16px; transition:box-shadow .25s;
+  animation:slideUp .35s ease both;
+}
+.addr-card:hover { box-shadow:0 8px 24px rgba(0,0,0,.1); }
+@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+.addr-label {
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--orange); color:#fff;
+  padding:3px 12px; border-radius:99px;
+  font-size:.7rem; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; margin-bottom:10px;
+}
+.addr-label.default-badge { background:var(--green); }
+
+.addr-name { font-weight:700; font-size:.96rem; color:var(--dark); margin-bottom:3px; }
+.addr-phone { font-size:.82rem; color:var(--gray); margin-bottom:6px; }
+.addr-text { font-size:.88rem; color:var(--gray); line-height:1.55; }
+
+.addr-actions { display:flex; gap:8px; flex-shrink:0; }
+.btn-def {
+  background:#f0fdf4; color:var(--green); border:1px solid #bbf7d0;
+  padding:7px 14px; border-radius:99px; font-size:.78rem; font-weight:600;
+  cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; white-space:nowrap;
+}
+.btn-def:hover { background:var(--green); color:#fff; border-color:var(--green); }
+.btn-del {
+  background:#fff0f0; color:#dc2626; border:1px solid #fecaca;
+  padding:7px 14px; border-radius:99px; font-size:.78rem; font-weight:600;
+  text-decoration:none; transition:all .2s; white-space:nowrap;
+}
+.btn-del:hover { background:#dc2626; color:#fff; border-color:#dc2626; text-decoration:none; }
+
+.btn-add-addr {
+  display:flex; align-items:center; gap:8px; justify-content:center;
+  width:100%; padding:16px; border-radius:18px;
+  border:2px dashed var(--border); background:transparent;
+  color:var(--gray); font-size:.92rem; font-weight:600;
+  cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:all .2s; text-decoration:none; margin-top:8px;
+}
+.btn-add-addr:hover { border-color:var(--orange); color:var(--orange); background:#fff8f5; text-decoration:none; }
+
+.empty-addr { text-align:center; padding:60px 20px; }
+.empty-addr .ei { font-size:3.5rem; margin-bottom:14px; }
+.empty-addr h3 { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--dark); margin-bottom:8px; }
+.empty-addr p { color:var(--gray); font-size:.9rem; }
+</style>
+
+<div class="page-header">
+  <h1>Saved <span>Addresses</span></h1>
+  <p>Manage your delivery addresses</p>
+</div>
+
+<div class="addr-wrap">
+
+  {% if addresses %}
+    {% for addr in addresses %}
+    <div class="addr-card" style="animation-delay:{{ forloop.counter0 }}50ms">
+      <div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <span class="addr-label">{{ addr.label }}</span>
+          {% if addr.is_default %}<span class="addr-label default-badge">✓ Default</span>{% endif %}
+        </div>
+        <div class="addr-name">{{ addr.full_name }}</div>
+        <div class="addr-phone">📱 {{ addr.phone }}</div>
+        <div class="addr-text">📍 {{ addr.address }}</div>
+      </div>
+      <div class="addr-actions">
+        {% if not addr.is_default %}
+        <form method="POST" action="{% url 'address_set_default' addr.id %}" style="display:contents">
+          {% csrf_token %}
+          <button type="submit" class="btn-def">Set Default</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'address_delete' addr.id %}"
+           onclick="return confirm('Delete this address?')"
+           class="btn-del">🗑 Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="empty-addr">
+    <div class="ei">📍</div>
+    <h3>No saved addresses</h3>
+    <p>Add your delivery addresses for faster checkout!</p>
+  </div>
+  {% endif %}
+
+  <a href="{% url 'address_add' %}" class="btn-add-addr">
+    ＋ Add New Address
+  </a>
+
+</div>
+{% endblock %}

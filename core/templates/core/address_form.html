@@ -1,0 +1,81 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root { --orange:#FF5722; --dark:#111; --cream:#FFFBF7; --gray:#6b7280; --border:#e5e7eb; }
+* { box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); }
+.form-wrap { max-width:520px; margin:0 auto; padding:40px 5vw 60px; }
+.form-card { background:#fff; border-radius:20px; padding:32px; box-shadow:0 2px 18px rgba(0,0,0,.08); }
+.form-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--dark); margin-bottom:24px; }
+.fg { margin-bottom:18px; }
+.fg label { display:block; font-size:.82rem; font-weight:600; color:var(--dark); margin-bottom:7px; }
+.fg input, .fg textarea, .fg select {
+  width:100%; padding:12px 16px; border-radius:12px;
+  border:1.5px solid var(--border); font-size:.92rem;
+  font-family:'DM Sans',sans-serif; color:var(--dark);
+  background:#f9fafb; outline:none; transition:border .2s;
+}
+.fg textarea { min-height:90px; resize:vertical; }
+.fg input:focus, .fg textarea:focus, .fg select:focus {
+  border-color:var(--orange); background:#fff;
+  box-shadow:0 0 0 3px rgba(255,87,34,.1);
+}
+.check-row { display:flex; align-items:center; gap:10px; font-size:.88rem; color:var(--gray); }
+.check-row input { width:auto; }
+.btn-save {
+  display:block; width:100%; background:var(--orange); color:#fff;
+  padding:14px; border-radius:12px; font-weight:700; font-size:.96rem;
+  border:none; cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:all .22s; margin-top:8px;
+  box-shadow:0 5px 18px rgba(255,87,34,.3);
+}
+.btn-save:hover { background:#FF7043; transform:translateY(-2px); }
+.btn-back-link { display:block; text-align:center; margin-top:14px; color:var(--gray); font-size:.88rem; text-decoration:none; }
+.btn-back-link:hover { color:var(--dark); }
+</style>
+
+<div class="form-wrap">
+  <div class="form-card">
+    <h2 class="form-title">📍 Add New Address</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <div class="fg">
+        <label>Label</label>
+        <select name="label">
+          <option value="Home">🏠 Home</option>
+          <option value="Work">💼 Work</option>
+          <option value="Other">📍 Other</option>
+        </select>
+      </div>
+
+      <div class="fg">
+        <label>Full Name</label>
+        <input type="text" name="full_name" placeholder="Recipient's full name" required>
+      </div>
+
+      <div class="fg">
+        <label>Phone Number</label>
+        <input type="tel" name="phone" placeholder="10-digit mobile number" maxlength="10" required>
+      </div>
+
+      <div class="fg">
+        <label>Full Address</label>
+        <textarea name="address" placeholder="House no., Street, Area, City, Pincode" required></textarea>
+      </div>
+
+      <div class="fg">
+        <div class="check-row">
+          <input type="checkbox" name="is_default" id="isDefault">
+          <label for="isDefault">Set as default address</label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-save">💾 Save Address</button>
+    </form>
+    <a href="{% url 'address_list' %}" class="btn-back-link">← Back to addresses</a>
+  </div>
+</div>
+{% endblock %}
