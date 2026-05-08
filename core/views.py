@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -18,8 +20,8 @@ import razorpay
 import json
 
 # Razorpay client
-RAZORPAY_KEY_ID = "rzp_test_SbeuOROXnHQDuz"
-RAZORPAY_KEY_SECRET = "lnJwqU1kOXSLYh4091mKbpNk"
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 
