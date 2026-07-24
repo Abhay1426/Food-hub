@@ -1,1 +1,25 @@
 .env
+# Virtual Environment
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Data
+data/chroma/
+data/raw/
+data/processed/
+
+# OS
+.DS_Store
+Thumbs.db
